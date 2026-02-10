@@ -62,6 +62,17 @@ const Index = () => {
     setCharacter(null);
   };
 
+  const backToNames = () => {
+    reset();
+    setCharacter(null);
+    setYourName("");
+    setTheirName("");
+  };
+
+  if (!yourName || !theirName) {
+    return <NameEntry onSubmit={(y, t) => { setYourName(y); setTheirName(t); }} />;
+  }
+
   if (!character) {
     return <CharacterSelect onSelect={setCharacter} />;
   }
