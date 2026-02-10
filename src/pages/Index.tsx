@@ -57,6 +57,8 @@ const Index = () => {
     setOutcome(null);
     setShowOutcome(false);
     setMatchPhase(null);
+    setNoDodgeCount(0);
+    setShakeRight(false);
   };
 
   const backToSelect = () => {
