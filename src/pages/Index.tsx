@@ -96,12 +96,12 @@ const Index = () => {
       {matchPhase === "celebrating" && <ConfettiHearts />}
 
       <motion.h1
-        className="text-4xl sm:text-5xl md:text-6xl text-foreground mb-8 sm:mb-12 text-center"
+        className="text-3xl sm:text-4xl md:text-5xl text-foreground mb-8 sm:mb-12 text-center"
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 200, damping: 15 }}
       >
-        BE MY VALENTINE?
+        {theirName}, will you be {yourName}'s Valentine?
       </motion.h1>
 
       <div className="flex flex-col sm:flex-row items-center sm:items-end gap-8 sm:gap-12 md:gap-20">
