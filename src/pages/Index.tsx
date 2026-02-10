@@ -6,12 +6,15 @@ import PixelPanda from "@/components/PixelPanda";
 import ChoiceButton from "@/components/ChoiceButton";
 import ConfettiHearts from "@/components/ConfettiHearts";
 import CharacterSelect, { type CharacterType } from "@/components/CharacterSelect";
+import NameEntry from "@/components/NameEntry";
 
 type Choice = null | "YES" | "NO";
 type Outcome = null | "match" | "no-match" | "mismatch";
 type MatchPhase = "approaching" | "pecking" | "celebrating";
 
 const Index = () => {
+  const [yourName, setYourName] = useState("");
+  const [theirName, setTheirName] = useState("");
   const [character, setCharacter] = useState<CharacterType | null>(null);
   const [leftChoice, setLeftChoice] = useState<Choice>(null);
   const [rightChoice, setRightChoice] = useState<Choice>(null);
