@@ -8,6 +8,7 @@ import CharacterSelect, { type CharacterType } from "@/components/CharacterSelec
 
 type Choice = null | "YES" | "NO";
 type Outcome = null | "match" | "no-match" | "mismatch";
+type MatchPhase = "approaching" | "pecking" | "celebrating";
 
 const Index = () => {
   const [character, setCharacter] = useState<CharacterType | null>(null);
@@ -15,6 +16,7 @@ const Index = () => {
   const [rightChoice, setRightChoice] = useState<Choice>(null);
   const [outcome, setOutcome] = useState<Outcome>(null);
   const [showOutcome, setShowOutcome] = useState(false);
+  const [matchPhase, setMatchPhase] = useState<MatchPhase | null>(null);
 
   useEffect(() => {
     if (leftChoice && rightChoice) {
@@ -28,11 +30,27 @@ const Index = () => {
     }
   }, [leftChoice, rightChoice]);
 
+  // Match phase progression: approach → peck → celebrate
+  useEffect(() => {
+    if (outcome !== "match") {
+      setMatchPhase(null);
+      return;
+    }
+    setMatchPhase("approaching");
+    const peckTimer = setTimeout(() => setMatchPhase("pecking"), 900);
+    const celebrateTimer = setTimeout(() => setMatchPhase("celebrating"), 1500);
+    return () => {
+      clearTimeout(peckTimer);
+      clearTimeout(celebrateTimer);
+    };
+  }, [outcome]);
+
   const reset = () => {
     setLeftChoice(null);
     setRightChoice(null);
     setOutcome(null);
     setShowOutcome(false);
+    setMatchPhase(null);
   };
 
   const backToSelect = () => {
@@ -49,12 +67,18 @@ const Index = () => {
 
   const CharacterComponent = character === "alpaca" ? PixelAlpaca : PixelDino;
 
+  // Calculate approach distance to make sprites touch
+  // Alpaca: 12 cols × 12px = 144px wide; Dino: 15 cols × 8px = 120px wide
+  // Gap is ~48-80px depending on viewport. We close the gap fully for peck.
+  const approachDist = character === "alpaca" ? 55 : 48;
+  const celebrating = matchPhase === "celebrating";
+
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4 py-8 overflow-hidden relative"
       style={{ fontFamily: "'Patrick Hand', cursive" }}
     >
-      {outcome === "match" && <ConfettiHearts />}
+      {matchPhase === "celebrating" && <ConfettiHearts />}
 
       <motion.h1
         className="text-4xl sm:text-5xl md:text-6xl text-foreground mb-8 sm:mb-12 text-center"
@@ -72,7 +96,7 @@ const Index = () => {
           animate={
             showOutcome
               ? outcome === "match"
-                ? { x: 40 }
+                ? { x: matchPhase === "approaching" ? approachDist : matchPhase === "pecking" ? approachDist + 8 : approachDist - 5 }
                 : outcome === "no-match"
                 ? { x: -300, opacity: 0 }
                 : leftSaidYes
@@ -80,16 +104,14 @@ const Index = () => {
                 : { x: -300, opacity: 0 }
               : {}
           }
-          transition={{ duration: 1, ease: "easeInOut" }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
         >
           <motion.div
             animate={
-              outcome === "match" ? { y: [0, -15, 0] } : {}
+              celebrating ? { y: [0, -15, 0] } : {}
             }
             transition={
-              outcome === "match"
-                ? { repeat: Infinity, duration: 0.5 }
-                : {}
+              celebrating ? { repeat: Infinity, duration: 0.5 } : {}
             }
           >
             <CharacterComponent
@@ -110,12 +132,13 @@ const Index = () => {
 
         {/* Heart between characters */}
         <AnimatePresence>
-          {outcome === "match" && showOutcome && (
+          {matchPhase === "celebrating" && (
             <motion.div
-              className="text-5xl sm:text-6xl"
+              className="text-5xl sm:text-6xl absolute"
               initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: [1, 1.2, 1], opacity: 1 }}
+              animate={{ scale: [1, 1.3, 1], opacity: 1 }}
               transition={{ repeat: Infinity, duration: 1 }}
+              style={{ zIndex: 10 }}
             >
               ❤️
             </motion.div>
@@ -128,7 +151,7 @@ const Index = () => {
           animate={
             showOutcome
               ? outcome === "match"
-                ? { x: -40 }
+                ? { x: matchPhase === "approaching" ? -approachDist : matchPhase === "pecking" ? -(approachDist + 8) : -(approachDist - 5) }
                 : outcome === "no-match"
                 ? { x: 300, opacity: 0 }
                 : !leftSaidYes
@@ -136,16 +159,14 @@ const Index = () => {
                 : { x: 300, opacity: 0 }
               : {}
           }
-          transition={{ duration: 1, ease: "easeInOut" }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
         >
           <motion.div
             animate={
-              outcome === "match" ? { y: [0, -15, 0] } : {}
+              celebrating ? { y: [0, -15, 0] } : {}
             }
             transition={
-              outcome === "match"
-                ? { repeat: Infinity, duration: 0.5, delay: 0.25 }
-                : {}
+              celebrating ? { repeat: Infinity, duration: 0.5, delay: 0.25 } : {}
             }
           >
             <CharacterComponent
@@ -173,7 +194,7 @@ const Index = () => {
             className="mt-10 flex flex-col items-center gap-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: outcome === "match" ? 1.2 : 0.5 }}
           >
             <p className="text-3xl sm:text-4xl text-foreground text-center">
               {outcome === "match" && "It's a match! ❤️"}
