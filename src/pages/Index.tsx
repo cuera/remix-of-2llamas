@@ -7,6 +7,7 @@ import ChoiceButton from "@/components/ChoiceButton";
 import ConfettiHearts from "@/components/ConfettiHearts";
 import CharacterSelect, { type CharacterType } from "@/components/CharacterSelect";
 import NameEntry from "@/components/NameEntry";
+import DodgeNoButton from "@/components/DodgeNoButton";
 
 type Choice = null | "YES" | "NO";
 type Outcome = null | "match" | "no-match" | "mismatch";
@@ -21,7 +22,8 @@ const Index = () => {
   const [outcome, setOutcome] = useState<Outcome>(null);
   const [showOutcome, setShowOutcome] = useState(false);
   const [matchPhase, setMatchPhase] = useState<MatchPhase | null>(null);
-
+  const [noDodgeCount, setNoDodgeCount] = useState(0);
+  const [shakeRight, setShakeRight] = useState(false);
   useEffect(() => {
     if (leftChoice && rightChoice) {
       const timer = setTimeout(() => {
@@ -55,6 +57,8 @@ const Index = () => {
     setOutcome(null);
     setShowOutcome(false);
     setMatchPhase(null);
+    setNoDodgeCount(0);
+    setShakeRight(false);
   };
 
   const backToSelect = () => {
@@ -178,11 +182,20 @@ const Index = () => {
         >
           <motion.div
             animate={
-              celebrating ? { y: [0, -15, 0] } : {}
+              celebrating
+                ? { y: [0, -15, 0] }
+                : shakeRight
+                ? { rotate: [0, -5, 5, -3, 3, 0] }
+                : {}
             }
             transition={
-              celebrating ? { repeat: Infinity, duration: 0.5, delay: 0.25 } : {}
+              celebrating
+                ? { repeat: Infinity, duration: 0.5, delay: 0.25 }
+                : shakeRight
+                ? { duration: 0.4 }
+                : {}
             }
+            onAnimationComplete={() => setShakeRight(false)}
           >
             <CharacterComponent
               color="pink"
@@ -193,9 +206,43 @@ const Index = () => {
           {!showOutcome && (
             <div className="flex flex-col items-center gap-2">
               <span className="text-xl text-foreground tracking-wide">{theirName}</span>
-              <div className="flex gap-3">
-                <ChoiceButton label="YES" color="pink" selected={rightChoice === "YES"} onClick={() => setRightChoice("YES")} disabled={bothChosen} />
-                <ChoiceButton label="NO" color="pink" selected={rightChoice === "NO"} onClick={() => setRightChoice("NO")} disabled={bothChosen} />
+              <div className="flex gap-3 items-center">
+                <motion.div
+                  animate={{
+                    scale: noDodgeCount >= 4 ? 1.5 : noDodgeCount >= 3 ? 1.2 : 1,
+                    boxShadow: noDodgeCount >= 4
+                      ? "0 0 20px hsl(var(--alpaca-pink)), 0 0 40px hsl(var(--alpaca-pink))"
+                      : "none",
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  style={{ borderRadius: "0.375rem" }}
+                >
+                  <ChoiceButton
+                    label="YES"
+                    color="pink"
+                    selected={rightChoice === "YES"}
+                    onClick={() => setRightChoice("YES")}
+                    disabled={bothChosen}
+                  />
+                </motion.div>
+                {noDodgeCount >= 4 && (
+                  <motion.div
+                    className="absolute -top-2 -right-2 text-xs"
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
+                    transition={{ repeat: Infinity, duration: 1.5 }}
+                  />
+                )}
+                <DodgeNoButton
+                  color="pink"
+                  selected={rightChoice === "NO"}
+                  onClick={() => setRightChoice("NO")}
+                  disabled={bothChosen}
+                  dodgeCount={noDodgeCount}
+                  onDodge={() => {
+                    setNoDodgeCount((c) => c + 1);
+                    setShakeRight(true);
+                  }}
+                />
               </div>
             </div>
           )}
