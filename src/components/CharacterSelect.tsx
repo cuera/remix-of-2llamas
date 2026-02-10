@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
 import PixelAlpaca from "./PixelAlpaca";
 import PixelDino from "./PixelDino";
+import PixelPanda from "./PixelPanda";
 
-export type CharacterType = "alpaca" | "dino";
+export type CharacterType = "alpaca" | "dino" | "panda";
 
 interface CharacterSelectProps {
   onSelect: (type: CharacterType) => void;
