@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import PixelAlpaca from "@/components/PixelAlpaca";
+import PixelDino from "@/components/PixelDino";
 import ChoiceButton from "@/components/ChoiceButton";
 import ConfettiHearts from "@/components/ConfettiHearts";
+import CharacterSelect, { type CharacterType } from "@/components/CharacterSelect";
 
 type Choice = null | "YES" | "NO";
 type Outcome = null | "match" | "no-match" | "mismatch";
 
 const Index = () => {
+  const [character, setCharacter] = useState<CharacterType | null>(null);
   const [leftChoice, setLeftChoice] = useState<Choice>(null);
   const [rightChoice, setRightChoice] = useState<Choice>(null);
   const [outcome, setOutcome] = useState<Outcome>(null);
@@ -32,19 +35,27 @@ const Index = () => {
     setShowOutcome(false);
   };
 
-  const bothChosen = leftChoice !== null && rightChoice !== null;
+  const backToSelect = () => {
+    reset();
+    setCharacter(null);
+  };
 
-  // Determine who said YES and who said NO for mismatch
+  if (!character) {
+    return <CharacterSelect onSelect={setCharacter} />;
+  }
+
+  const bothChosen = leftChoice !== null && rightChoice !== null;
   const leftSaidYes = leftChoice === "YES";
 
+  const CharacterComponent = character === "alpaca" ? PixelAlpaca : PixelDino;
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 overflow-hidden relative"
+    <div
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-8 overflow-hidden relative"
       style={{ fontFamily: "'Patrick Hand', cursive" }}
     >
-      {/* Confetti for match */}
       {outcome === "match" && <ConfettiHearts />}
 
-      {/* Title */}
       <motion.h1
         className="text-4xl sm:text-5xl md:text-6xl text-foreground mb-8 sm:mb-12 text-center"
         initial={{ scale: 0.5, opacity: 0 }}
@@ -54,9 +65,8 @@ const Index = () => {
         BE MY VALENTINE?
       </motion.h1>
 
-      {/* Alpacas + Buttons area */}
       <div className="flex flex-col sm:flex-row items-center sm:items-end gap-8 sm:gap-12 md:gap-20">
-        {/* Left side - Green alpaca ("ME") */}
+        {/* Left side - Green character ("ME") */}
         <motion.div
           className="flex flex-col items-center gap-4"
           animate={
@@ -66,19 +76,15 @@ const Index = () => {
                 : outcome === "no-match"
                 ? { x: -300, opacity: 0 }
                 : leftSaidYes
-                ? {} // confused, stay
-                : { x: -300, opacity: 0 } // walk away
+                ? {}
+                : { x: -300, opacity: 0 }
               : {}
           }
           transition={{ duration: 1, ease: "easeInOut" }}
         >
           <motion.div
             animate={
-              outcome === "match"
-                ? { y: [0, -15, 0] }
-                : outcome === "mismatch" && leftSaidYes
-                ? {}
-                : {}
+              outcome === "match" ? { y: [0, -15, 0] } : {}
             }
             transition={
               outcome === "match"
@@ -86,7 +92,7 @@ const Index = () => {
                 : {}
             }
           >
-            <PixelAlpaca
+            <CharacterComponent
               color="green"
               confused={outcome === "mismatch" && leftSaidYes}
             />
@@ -95,26 +101,14 @@ const Index = () => {
             <div className="flex flex-col items-center gap-2">
               <span className="text-xl text-foreground tracking-wide">ME</span>
               <div className="flex gap-3">
-                <ChoiceButton
-                  label="NO"
-                  color="green"
-                  selected={leftChoice === "NO"}
-                  onClick={() => setLeftChoice("NO")}
-                  disabled={bothChosen}
-                />
-                <ChoiceButton
-                  label="YES"
-                  color="green"
-                  selected={leftChoice === "YES"}
-                  onClick={() => setLeftChoice("YES")}
-                  disabled={bothChosen}
-                />
+                <ChoiceButton label="NO" color="green" selected={leftChoice === "NO"} onClick={() => setLeftChoice("NO")} disabled={bothChosen} />
+                <ChoiceButton label="YES" color="green" selected={leftChoice === "YES"} onClick={() => setLeftChoice("YES")} disabled={bothChosen} />
               </div>
             </div>
           )}
         </motion.div>
 
-        {/* Heart between alpacas */}
+        {/* Heart between characters */}
         <AnimatePresence>
           {outcome === "match" && showOutcome && (
             <motion.div
@@ -128,7 +122,7 @@ const Index = () => {
           )}
         </AnimatePresence>
 
-        {/* Right side - Pink alpaca ("YOU") */}
+        {/* Right side - Pink character ("YOU") */}
         <motion.div
           className="flex flex-col items-center gap-4"
           animate={
@@ -138,19 +132,15 @@ const Index = () => {
                 : outcome === "no-match"
                 ? { x: 300, opacity: 0 }
                 : !leftSaidYes
-                ? {} // right said YES, confused
-                : { x: 300, opacity: 0 } // walk away
+                ? {}
+                : { x: 300, opacity: 0 }
               : {}
           }
           transition={{ duration: 1, ease: "easeInOut" }}
         >
           <motion.div
             animate={
-              outcome === "match"
-                ? { y: [0, -15, 0] }
-                : outcome === "mismatch" && !leftSaidYes
-                ? {}
-                : {}
+              outcome === "match" ? { y: [0, -15, 0] } : {}
             }
             transition={
               outcome === "match"
@@ -158,7 +148,7 @@ const Index = () => {
                 : {}
             }
           >
-            <PixelAlpaca
+            <CharacterComponent
               color="pink"
               mirror
               confused={outcome === "mismatch" && !leftSaidYes}
@@ -168,20 +158,8 @@ const Index = () => {
             <div className="flex flex-col items-center gap-2">
               <span className="text-xl text-foreground tracking-wide">YOU</span>
               <div className="flex gap-3">
-                <ChoiceButton
-                  label="YES"
-                  color="pink"
-                  selected={rightChoice === "YES"}
-                  onClick={() => setRightChoice("YES")}
-                  disabled={bothChosen}
-                />
-                <ChoiceButton
-                  label="NO"
-                  color="pink"
-                  selected={rightChoice === "NO"}
-                  onClick={() => setRightChoice("NO")}
-                  disabled={bothChosen}
-                />
+                <ChoiceButton label="YES" color="pink" selected={rightChoice === "YES"} onClick={() => setRightChoice("YES")} disabled={bothChosen} />
+                <ChoiceButton label="NO" color="pink" selected={rightChoice === "NO"} onClick={() => setRightChoice("NO")} disabled={bothChosen} />
               </div>
             </div>
           )}
@@ -202,21 +180,27 @@ const Index = () => {
               {outcome === "no-match" && "Maybe next time... 💔"}
               {outcome === "mismatch" && "Awkward... 😅"}
             </p>
-            <button
-              onClick={reset}
-              className="px-8 py-3 text-xl rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95"
-              style={{
-                borderColor: "hsl(var(--primary))",
-                fontFamily: "'Patrick Hand', cursive",
-              }}
-            >
-              Play Again 🔄
-            </button>
+            <div className="flex gap-4">
+              <button
+                onClick={reset}
+                className="px-8 py-3 text-xl rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95"
+                style={{ borderColor: "hsl(var(--primary))" }}
+              >
+                Play Again 🔄
+              </button>
+              <button
+                onClick={backToSelect}
+                className="px-8 py-3 text-xl rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95"
+                style={{ borderColor: "hsl(var(--accent))" }}
+              >
+                Switch Characters 🔀
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Floating hearts background decoration */}
+      {/* Floating hearts background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         {[...Array(6)].map((_, i) => (
           <motion.div
