@@ -7,6 +7,7 @@ import ChoiceButton from "@/components/ChoiceButton";
 import ConfettiHearts from "@/components/ConfettiHearts";
 import CharacterSelect, { type CharacterType } from "@/components/CharacterSelect";
 import NameEntry from "@/components/NameEntry";
+import DodgeNoButton from "@/components/DodgeNoButton";
 
 type Choice = null | "YES" | "NO";
 type Outcome = null | "match" | "no-match" | "mismatch";
