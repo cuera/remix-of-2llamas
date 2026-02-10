@@ -8,6 +8,7 @@ import ConfettiHearts from "@/components/ConfettiHearts";
 import CharacterSelect, { type CharacterType } from "@/components/CharacterSelect";
 import NameEntry from "@/components/NameEntry";
 import DodgeNoButton from "@/components/DodgeNoButton";
+import CountdownOverlay from "@/components/CountdownOverlay";
 
 type Choice = null | "YES" | "NO";
 type Outcome = null | "match" | "no-match" | "mismatch";
@@ -24,17 +25,22 @@ const Index = () => {
   const [matchPhase, setMatchPhase] = useState<MatchPhase | null>(null);
   const [noDodgeCount, setNoDodgeCount] = useState(0);
   const [shakeRight, setShakeRight] = useState(false);
+  const [showCountdown, setShowCountdown] = useState(false);
+
   useEffect(() => {
     if (leftChoice && rightChoice) {
-      const timer = setTimeout(() => {
-        if (leftChoice === "YES" && rightChoice === "YES") setOutcome("match");
-        else if (leftChoice === "NO" && rightChoice === "NO") setOutcome("no-match");
-        else setOutcome("mismatch");
-        setShowOutcome(true);
-      }, 800);
+      const timer = setTimeout(() => setShowCountdown(true), 400);
       return () => clearTimeout(timer);
     }
   }, [leftChoice, rightChoice]);
+
+  const handleCountdownComplete = () => {
+    setShowCountdown(false);
+    if (leftChoice === "YES" && rightChoice === "YES") setOutcome("match");
+    else if (leftChoice === "NO" && rightChoice === "NO") setOutcome("no-match");
+    else setOutcome("mismatch");
+    setShowOutcome(true);
+  };
 
   // Match phase progression: approach → peck → celebrate
   useEffect(() => {
@@ -59,6 +65,7 @@ const Index = () => {
     setMatchPhase(null);
     setNoDodgeCount(0);
     setShakeRight(false);
+    setShowCountdown(false);
   };
 
   const backToSelect = () => {
@@ -97,6 +104,7 @@ const Index = () => {
       className="min-h-screen flex flex-col items-center justify-center px-4 py-8 overflow-hidden relative"
       style={{ fontFamily: "'Patrick Hand', cursive" }}
     >
+      {showCountdown && <CountdownOverlay onComplete={handleCountdownComplete} />}
       {matchPhase === "celebrating" && <ConfettiHearts />}
 
       <motion.h1
