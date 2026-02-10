@@ -12,6 +12,7 @@ interface CharacterSelectProps {
 const characters: { type: CharacterType; label: string; emoji: string }[] = [
   { type: "alpaca", label: "Alpacas", emoji: "🦙" },
   { type: "dino", label: "Dinos", emoji: "🦕" },
+  { type: "panda", label: "Pandas", emoji: "🐼" },
 ];
 
 const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
