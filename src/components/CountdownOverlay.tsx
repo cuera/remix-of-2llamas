@@ -38,7 +38,7 @@ const CountdownOverlay = ({ onComplete }: CountdownOverlayProps) => {
               scale: [0, 1, 1.05, 1, 1.05, 1],
               opacity: 1,
             }}
-            exit={{ scale: 0.8, opacity: 0 }}
+            exit={{ scale: 0.8, opacity: 0, transition: { duration: 0.15 } }}
             transition={{
               scale: {
                 times: [0, 0.25, 0.45, 0.55, 0.75, 0.85],
@@ -46,7 +46,6 @@ const CountdownOverlay = ({ onComplete }: CountdownOverlayProps) => {
                 ease: "easeOut",
               },
               opacity: { duration: 0.2 },
-              exit: { duration: 0.15 },
             }}
           >
             {count}
