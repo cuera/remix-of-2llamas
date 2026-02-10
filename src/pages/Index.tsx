@@ -66,7 +66,7 @@ const Index = () => {
   const bothChosen = leftChoice !== null && rightChoice !== null;
   const leftSaidYes = leftChoice === "YES";
 
-  const CharacterComponent = character === "alpaca" ? PixelAlpaca : PixelDino;
+  const CharacterComponent = character === "alpaca" ? PixelAlpaca : character === "dino" ? PixelDino : PixelPanda;
 
   // Calculate approach distance to make sprites touch
   // Alpaca: 12 cols × 12px = 144px wide; Dino: 15 cols × 8px = 120px wide
