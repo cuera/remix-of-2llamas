@@ -208,8 +208,14 @@ const Index = () => {
               <span className="text-xl text-foreground tracking-wide">{theirName}</span>
               <div className="flex gap-3 items-center">
                 <motion.div
-                  animate={{ scale: noDodgeCount >= 4 ? 1.5 : noDodgeCount >= 3 ? 1.2 : 1 }}
+                  animate={{
+                    scale: noDodgeCount >= 4 ? 1.5 : noDodgeCount >= 3 ? 1.2 : 1,
+                    boxShadow: noDodgeCount >= 4
+                      ? "0 0 20px hsl(var(--alpaca-pink)), 0 0 40px hsl(var(--alpaca-pink))"
+                      : "none",
+                  }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  style={{ borderRadius: "0.375rem" }}
                 >
                   <ChoiceButton
                     label="YES"
