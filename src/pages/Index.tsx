@@ -211,11 +211,19 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: outcome === "match" ? 1.2 : 0.5 }}
           >
-            <p className="text-3xl sm:text-4xl text-foreground text-center">
-              {outcome === "match" && "It's a match! ❤️"}
-              {outcome === "no-match" && "Maybe next time... 💔"}
-              {outcome === "mismatch" && "Awkward... 😅"}
-            </p>
+            {outcome === "match" ? (
+              <div className="flex flex-col items-center gap-2">
+                <p className="text-3xl sm:text-4xl text-foreground text-center">
+                  {yourName} ❤️ {theirName}
+                </p>
+                <p className="text-xl sm:text-2xl text-muted-foreground">Valentine's Day 2026</p>
+              </div>
+            ) : (
+              <p className="text-3xl sm:text-4xl text-foreground text-center">
+                {outcome === "no-match" && "Maybe next time... 💔"}
+                {outcome === "mismatch" && "Awkward... 😅"}
+              </p>
+            )}
             <div className="flex gap-4">
               <button
                 onClick={reset}
