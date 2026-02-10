@@ -71,7 +71,7 @@ const Index = () => {
   // Calculate approach distance to make sprites touch
   // Alpaca: 12 cols × 12px = 144px wide; Dino: 15 cols × 8px = 120px wide
   // Gap is ~48-80px depending on viewport. We close the gap fully for peck.
-  const approachDist = character === "alpaca" ? 55 : 48;
+  const approachDist = character === "alpaca" ? 55 : character === "dino" ? 48 : 55;
   const celebrating = matchPhase === "celebrating";
 
   return (

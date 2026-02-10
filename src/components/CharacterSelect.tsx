@@ -54,10 +54,15 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
                   <PixelAlpaca color="green" className="scale-75" />
                   <PixelAlpaca color="pink" mirror className="scale-75" />
                 </>
-              ) : (
+              ) : char.type === "dino" ? (
                 <>
                   <PixelDino color="green" className="scale-75" />
                   <PixelDino color="pink" mirror className="scale-75" />
+                </>
+              ) : (
+                <>
+                  <PixelPanda color="green" className="scale-75" />
+                  <PixelPanda color="pink" mirror className="scale-75" />
                 </>
               )}
             </div>
