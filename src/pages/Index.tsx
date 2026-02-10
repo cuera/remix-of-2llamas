@@ -25,17 +25,22 @@ const Index = () => {
   const [matchPhase, setMatchPhase] = useState<MatchPhase | null>(null);
   const [noDodgeCount, setNoDodgeCount] = useState(0);
   const [shakeRight, setShakeRight] = useState(false);
+  const [showCountdown, setShowCountdown] = useState(false);
+
   useEffect(() => {
     if (leftChoice && rightChoice) {
-      const timer = setTimeout(() => {
-        if (leftChoice === "YES" && rightChoice === "YES") setOutcome("match");
-        else if (leftChoice === "NO" && rightChoice === "NO") setOutcome("no-match");
-        else setOutcome("mismatch");
-        setShowOutcome(true);
-      }, 800);
+      const timer = setTimeout(() => setShowCountdown(true), 400);
       return () => clearTimeout(timer);
     }
   }, [leftChoice, rightChoice]);
+
+  const handleCountdownComplete = () => {
+    setShowCountdown(false);
+    if (leftChoice === "YES" && rightChoice === "YES") setOutcome("match");
+    else if (leftChoice === "NO" && rightChoice === "NO") setOutcome("no-match");
+    else setOutcome("mismatch");
+    setShowOutcome(true);
+  };
 
   // Match phase progression: approach → peck → celebrate
   useEffect(() => {
