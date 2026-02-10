@@ -22,7 +22,8 @@ const Index = () => {
   const [outcome, setOutcome] = useState<Outcome>(null);
   const [showOutcome, setShowOutcome] = useState(false);
   const [matchPhase, setMatchPhase] = useState<MatchPhase | null>(null);
-
+  const [noDodgeCount, setNoDodgeCount] = useState(0);
+  const [shakeRight, setShakeRight] = useState(false);
   useEffect(() => {
     if (leftChoice && rightChoice) {
       const timer = setTimeout(() => {
