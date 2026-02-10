@@ -6,12 +6,15 @@ import PixelPanda from "@/components/PixelPanda";
 import ChoiceButton from "@/components/ChoiceButton";
 import ConfettiHearts from "@/components/ConfettiHearts";
 import CharacterSelect, { type CharacterType } from "@/components/CharacterSelect";
+import NameEntry from "@/components/NameEntry";
 
 type Choice = null | "YES" | "NO";
 type Outcome = null | "match" | "no-match" | "mismatch";
 type MatchPhase = "approaching" | "pecking" | "celebrating";
 
 const Index = () => {
+  const [yourName, setYourName] = useState("");
+  const [theirName, setTheirName] = useState("");
   const [character, setCharacter] = useState<CharacterType | null>(null);
   const [leftChoice, setLeftChoice] = useState<Choice>(null);
   const [rightChoice, setRightChoice] = useState<Choice>(null);
@@ -59,6 +62,17 @@ const Index = () => {
     setCharacter(null);
   };
 
+  const backToNames = () => {
+    reset();
+    setCharacter(null);
+    setYourName("");
+    setTheirName("");
+  };
+
+  if (!yourName || !theirName) {
+    return <NameEntry onSubmit={(y, t) => { setYourName(y); setTheirName(t); }} />;
+  }
+
   if (!character) {
     return <CharacterSelect onSelect={setCharacter} />;
   }
@@ -82,12 +96,12 @@ const Index = () => {
       {matchPhase === "celebrating" && <ConfettiHearts />}
 
       <motion.h1
-        className="text-4xl sm:text-5xl md:text-6xl text-foreground mb-8 sm:mb-12 text-center"
+        className="text-3xl sm:text-4xl md:text-5xl text-foreground mb-8 sm:mb-12 text-center"
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 200, damping: 15 }}
       >
-        BE MY VALENTINE?
+        {theirName}, will you be {yourName}'s Valentine?
       </motion.h1>
 
       <div className="flex flex-col sm:flex-row items-center sm:items-end gap-8 sm:gap-12 md:gap-20">
@@ -122,7 +136,7 @@ const Index = () => {
           </motion.div>
           {!showOutcome && (
             <div className="flex flex-col items-center gap-2">
-              <span className="text-xl text-foreground tracking-wide">ME</span>
+              <span className="text-xl text-foreground tracking-wide">{yourName}</span>
               <div className="flex gap-3">
                 <ChoiceButton label="NO" color="green" selected={leftChoice === "NO"} onClick={() => setLeftChoice("NO")} disabled={bothChosen} />
                 <ChoiceButton label="YES" color="green" selected={leftChoice === "YES"} onClick={() => setLeftChoice("YES")} disabled={bothChosen} />
@@ -178,7 +192,7 @@ const Index = () => {
           </motion.div>
           {!showOutcome && (
             <div className="flex flex-col items-center gap-2">
-              <span className="text-xl text-foreground tracking-wide">YOU</span>
+              <span className="text-xl text-foreground tracking-wide">{theirName}</span>
               <div className="flex gap-3">
                 <ChoiceButton label="YES" color="pink" selected={rightChoice === "YES"} onClick={() => setRightChoice("YES")} disabled={bothChosen} />
                 <ChoiceButton label="NO" color="pink" selected={rightChoice === "NO"} onClick={() => setRightChoice("NO")} disabled={bothChosen} />
@@ -197,11 +211,19 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: outcome === "match" ? 1.2 : 0.5 }}
           >
-            <p className="text-3xl sm:text-4xl text-foreground text-center">
-              {outcome === "match" && "It's a match! ❤️"}
-              {outcome === "no-match" && "Maybe next time... 💔"}
-              {outcome === "mismatch" && "Awkward... 😅"}
-            </p>
+            {outcome === "match" ? (
+              <div className="flex flex-col items-center gap-2">
+                <p className="text-3xl sm:text-4xl text-foreground text-center">
+                  {yourName} ❤️ {theirName}
+                </p>
+                <p className="text-xl sm:text-2xl text-muted-foreground">Valentine's Day 2026</p>
+              </div>
+            ) : (
+              <p className="text-3xl sm:text-4xl text-foreground text-center">
+                {outcome === "no-match" && "Maybe next time... 💔"}
+                {outcome === "mismatch" && "Awkward... 😅"}
+              </p>
+            )}
             <div className="flex gap-4">
               <button
                 onClick={reset}
