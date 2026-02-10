@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
 import PixelAlpaca from "./PixelAlpaca";
 import PixelDino from "./PixelDino";
+import PixelPanda from "./PixelPanda";
 
-export type CharacterType = "alpaca" | "dino";
+export type CharacterType = "alpaca" | "dino" | "panda";
 
 interface CharacterSelectProps {
   onSelect: (type: CharacterType) => void;
@@ -11,6 +12,7 @@ interface CharacterSelectProps {
 const characters: { type: CharacterType; label: string; emoji: string }[] = [
   { type: "alpaca", label: "Alpacas", emoji: "🦙" },
   { type: "dino", label: "Dinos", emoji: "🦕" },
+  { type: "panda", label: "Pandas", emoji: "🐼" },
 ];
 
 const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
@@ -52,10 +54,15 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
                   <PixelAlpaca color="green" className="scale-75" />
                   <PixelAlpaca color="pink" mirror className="scale-75" />
                 </>
-              ) : (
+              ) : char.type === "dino" ? (
                 <>
                   <PixelDino color="green" className="scale-75" />
                   <PixelDino color="pink" mirror className="scale-75" />
+                </>
+              ) : (
+                <>
+                  <PixelPanda color="green" className="scale-75" />
+                  <PixelPanda color="pink" mirror className="scale-75" />
                 </>
               )}
             </div>

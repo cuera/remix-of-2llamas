@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import PixelAlpaca from "@/components/PixelAlpaca";
 import PixelDino from "@/components/PixelDino";
+import PixelPanda from "@/components/PixelPanda";
 import ChoiceButton from "@/components/ChoiceButton";
 import ConfettiHearts from "@/components/ConfettiHearts";
 import CharacterSelect, { type CharacterType } from "@/components/CharacterSelect";
@@ -65,12 +66,12 @@ const Index = () => {
   const bothChosen = leftChoice !== null && rightChoice !== null;
   const leftSaidYes = leftChoice === "YES";
 
-  const CharacterComponent = character === "alpaca" ? PixelAlpaca : PixelDino;
+  const CharacterComponent = character === "alpaca" ? PixelAlpaca : character === "dino" ? PixelDino : PixelPanda;
 
   // Calculate approach distance to make sprites touch
   // Alpaca: 12 cols × 12px = 144px wide; Dino: 15 cols × 8px = 120px wide
   // Gap is ~48-80px depending on viewport. We close the gap fully for peck.
-  const approachDist = character === "alpaca" ? 55 : 48;
+  const approachDist = character === "alpaca" ? 55 : character === "dino" ? 48 : 55;
   const celebrating = matchPhase === "celebrating";
 
   return (
