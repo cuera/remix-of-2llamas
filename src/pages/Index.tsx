@@ -192,7 +192,7 @@ const Index = () => {
           </motion.div>
           {!showOutcome && (
             <div className="flex flex-col items-center gap-2">
-              <span className="text-xl text-foreground tracking-wide">YOU</span>
+              <span className="text-xl text-foreground tracking-wide">{theirName}</span>
               <div className="flex gap-3">
                 <ChoiceButton label="YES" color="pink" selected={rightChoice === "YES"} onClick={() => setRightChoice("YES")} disabled={bothChosen} />
                 <ChoiceButton label="NO" color="pink" selected={rightChoice === "NO"} onClick={() => setRightChoice("NO")} disabled={bothChosen} />
