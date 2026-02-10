@@ -8,6 +8,7 @@ import ConfettiHearts from "@/components/ConfettiHearts";
 import CharacterSelect, { type CharacterType } from "@/components/CharacterSelect";
 import NameEntry from "@/components/NameEntry";
 import DodgeNoButton from "@/components/DodgeNoButton";
+import CountdownOverlay from "@/components/CountdownOverlay";
 
 type Choice = null | "YES" | "NO";
 type Outcome = null | "match" | "no-match" | "mismatch";
