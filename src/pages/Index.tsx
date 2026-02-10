@@ -104,6 +104,7 @@ const Index = () => {
       className="min-h-screen flex flex-col items-center justify-center px-4 py-8 overflow-hidden relative"
       style={{ fontFamily: "'Patrick Hand', cursive" }}
     >
+      {showCountdown && <CountdownOverlay onComplete={handleCountdownComplete} />}
       {matchPhase === "celebrating" && <ConfettiHearts />}
 
       <motion.h1
