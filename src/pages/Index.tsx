@@ -182,11 +182,20 @@ const Index = () => {
         >
           <motion.div
             animate={
-              celebrating ? { y: [0, -15, 0] } : {}
+              celebrating
+                ? { y: [0, -15, 0] }
+                : shakeRight
+                ? { rotate: [0, -5, 5, -3, 3, 0] }
+                : {}
             }
             transition={
-              celebrating ? { repeat: Infinity, duration: 0.5, delay: 0.25 } : {}
+              celebrating
+                ? { repeat: Infinity, duration: 0.5, delay: 0.25 }
+                : shakeRight
+                ? { duration: 0.4 }
+                : {}
             }
+            onAnimationComplete={() => setShakeRight(false)}
           >
             <CharacterComponent
               color="pink"
@@ -197,9 +206,37 @@ const Index = () => {
           {!showOutcome && (
             <div className="flex flex-col items-center gap-2">
               <span className="text-xl text-foreground tracking-wide">{theirName}</span>
-              <div className="flex gap-3">
-                <ChoiceButton label="YES" color="pink" selected={rightChoice === "YES"} onClick={() => setRightChoice("YES")} disabled={bothChosen} />
-                <ChoiceButton label="NO" color="pink" selected={rightChoice === "NO"} onClick={() => setRightChoice("NO")} disabled={bothChosen} />
+              <div className="flex gap-3 items-center">
+                <motion.div
+                  animate={{ scale: noDodgeCount >= 4 ? 1.5 : noDodgeCount >= 3 ? 1.2 : 1 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
+                  <ChoiceButton
+                    label="YES"
+                    color="pink"
+                    selected={rightChoice === "YES"}
+                    onClick={() => setRightChoice("YES")}
+                    disabled={bothChosen}
+                  />
+                </motion.div>
+                {noDodgeCount >= 4 && (
+                  <motion.div
+                    className="absolute -top-2 -right-2 text-xs"
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
+                    transition={{ repeat: Infinity, duration: 1.5 }}
+                  />
+                )}
+                <DodgeNoButton
+                  color="pink"
+                  selected={rightChoice === "NO"}
+                  onClick={() => setRightChoice("NO")}
+                  disabled={bothChosen}
+                  dodgeCount={noDodgeCount}
+                  onDodge={() => {
+                    setNoDodgeCount((c) => c + 1);
+                    setShakeRight(true);
+                  }}
+                />
               </div>
             </div>
           )}
