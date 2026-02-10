@@ -46,6 +46,38 @@ const MatchCertificate = ({
     }
   }, [yourName, theirName]);
 
+  const handleShareStories = useCallback(async () => {
+    if (!cardRef.current) return;
+    try {
+      const dataUrl = await toPng(cardRef.current, {
+        pixelRatio: 3,
+        backgroundColor: "#1a0a1e",
+      });
+      // Convert to blob for share API
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+      const file = new File([blob], `valentine-${yourName}-${theirName}.png`, {
+        type: "image/png",
+      });
+
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({
+          title: `${yourName} ❤️ ${theirName} — Valentine's Day 2026`,
+          text: `It's a match! ${yourName} ❤️ ${theirName}`,
+          files: [file],
+        });
+      } else {
+        // Fallback: download the image
+        handleDownload();
+      }
+    } catch (err) {
+      if ((err as Error).name !== "AbortError") {
+        console.error("Share failed:", err);
+        handleDownload();
+      }
+    }
+  }, [yourName, theirName, handleDownload]);
+
   return (
     <motion.div
       className="flex flex-col items-center gap-6 w-full px-4"
@@ -56,7 +88,7 @@ const MatchCertificate = ({
       {/* Polaroid Card */}
       <div
         ref={cardRef}
-        className="relative flex flex-col items-center px-8 pt-8 pb-10 sm:px-12 sm:pt-10 sm:pb-14"
+        className="relative flex flex-col items-center"
         style={{
           background: "linear-gradient(145deg, #fdf6f0 0%, #fff0f5 50%, #fce4ec 100%)",
           borderRadius: "6px",
@@ -65,6 +97,7 @@ const MatchCertificate = ({
           maxWidth: 380,
           width: "100%",
           transform: "rotate(-1.5deg)",
+          padding: "32px 32px 28px",
         }}
       >
         {/* Tape effect top */}
@@ -82,7 +115,7 @@ const MatchCertificate = ({
 
         {/* Inner photo area */}
         <div
-          className="w-full flex flex-col items-center gap-3 py-6 px-4 mb-6"
+          className="w-full flex flex-col items-center gap-3 py-6 px-4 mb-5"
           style={{
             background: "linear-gradient(180deg, hsl(276 45% 22%) 0%, hsl(276 40% 18%) 100%)",
             borderRadius: "3px",
@@ -113,7 +146,7 @@ const MatchCertificate = ({
           </div>
 
           {/* It's a match! */}
-          <motion.p
+          <p
             className="text-2xl sm:text-3xl font-bold tracking-wide"
             style={{
               color: "hsl(330, 80%, 70%)",
@@ -122,7 +155,7 @@ const MatchCertificate = ({
             }}
           >
             It's a match!
-          </motion.p>
+          </p>
         </div>
 
         {/* Names */}
@@ -148,6 +181,18 @@ const MatchCertificate = ({
           Valentine's Day 2026
         </p>
 
+        {/* App URL watermark */}
+        <p
+          className="mt-3 text-xs tracking-wider"
+          style={{
+            color: "hsl(276, 15%, 62%)",
+            fontFamily: "'Patrick Hand', cursive",
+            letterSpacing: "0.1em",
+          }}
+        >
+          valentine-alpaca.lovable.app
+        </p>
+
         {/* Decorative corner hearts */}
         <span className="absolute top-3 left-3 text-sm opacity-30">💕</span>
         <span className="absolute top-3 right-3 text-sm opacity-30">💕</span>
@@ -156,19 +201,34 @@ const MatchCertificate = ({
       </div>
 
       {/* Action buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 items-center mt-2">
-        <motion.button
-          onClick={handleDownload}
-          className="px-8 py-3 text-xl rounded-lg text-white transition-all"
-          style={{
-            background: "linear-gradient(135deg, hsl(330, 80%, 55%), hsl(340, 90%, 65%))",
-            boxShadow: "0 4px 15px hsla(330, 80%, 55%, 0.4)",
-          }}
-          whileHover={{ scale: 1.05, boxShadow: "0 6px 25px hsla(330, 80%, 55%, 0.6)" }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Save Screenshot 📸
-        </motion.button>
+      <div className="flex flex-col items-center gap-3 mt-2">
+        <div className="flex flex-col sm:flex-row gap-3 items-center">
+          <motion.button
+            onClick={handleDownload}
+            className="px-8 py-3 text-xl rounded-lg text-white transition-all"
+            style={{
+              background: "linear-gradient(135deg, hsl(330, 80%, 55%), hsl(340, 90%, 65%))",
+              boxShadow: "0 4px 15px hsla(330, 80%, 55%, 0.4)",
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Download Card 📸
+          </motion.button>
+
+          <motion.button
+            onClick={handleShareStories}
+            className="px-8 py-3 text-xl rounded-lg text-white transition-all"
+            style={{
+              background: "linear-gradient(135deg, hsl(280, 70%, 50%), hsl(320, 80%, 55%))",
+              boxShadow: "0 4px 15px hsla(280, 70%, 50%, 0.4)",
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Share to Stories 📱
+          </motion.button>
+        </div>
 
         <div className="flex gap-3">
           <button

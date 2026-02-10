@@ -3,14 +3,16 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface CountdownOverlayProps {
   onComplete: () => void;
+  onTick?: () => void;
 }
 
-const CountdownOverlay = ({ onComplete }: CountdownOverlayProps) => {
+const CountdownOverlay = ({ onComplete, onTick }: CountdownOverlayProps) => {
   const [count, setCount] = useState(3);
   const [flash, setFlash] = useState(false);
 
   useEffect(() => {
     if (count > 0) {
+      onTick?.();
       const timer = setTimeout(() => setCount((c) => c - 1), 1000);
       return () => clearTimeout(timer);
     } else {

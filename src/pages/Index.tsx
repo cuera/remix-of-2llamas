@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import PixelAlpaca from "@/components/PixelAlpaca";
 import PixelDino from "@/components/PixelDino";
@@ -10,6 +10,9 @@ import MatchCertificate from "@/components/MatchCertificate";
 import NameEntry from "@/components/NameEntry";
 import DodgeNoButton from "@/components/DodgeNoButton";
 import CountdownOverlay from "@/components/CountdownOverlay";
+import IntroSequence from "@/components/IntroSequence";
+import SoundToggle from "@/components/SoundToggle";
+import { useSoundEffects } from "@/hooks/useSoundEffects";
 
 type Choice = null | "YES" | "NO";
 type Outcome = null | "match" | "no-match" | "mismatch";
@@ -19,6 +22,8 @@ const Index = () => {
   const [yourName, setYourName] = useState("");
   const [theirName, setTheirName] = useState("");
   const [character, setCharacter] = useState<CharacterType | null>(null);
+  const [showIntro, setShowIntro] = useState(false);
+  const [introComplete, setIntroComplete] = useState(false);
   const [leftChoice, setLeftChoice] = useState<Choice>(null);
   const [rightChoice, setRightChoice] = useState<Choice>(null);
   const [outcome, setOutcome] = useState<Outcome>(null);
@@ -27,6 +32,21 @@ const Index = () => {
   const [noDodgeCount, setNoDodgeCount] = useState(0);
   const [shakeRight, setShakeRight] = useState(false);
   const [showCountdown, setShowCountdown] = useState(false);
+
+  const sound = useSoundEffects();
+
+  // When character is selected, show intro
+  const handleCharacterSelect = useCallback((type: CharacterType) => {
+    setCharacter(type);
+    setShowIntro(true);
+    setIntroComplete(false);
+  }, []);
+
+  const handleIntroComplete = useCallback(() => {
+    setShowIntro(false);
+    setIntroComplete(true);
+    sound.playBloop();
+  }, [sound]);
 
   useEffect(() => {
     if (leftChoice && rightChoice) {
@@ -37,13 +57,19 @@ const Index = () => {
 
   const handleCountdownComplete = () => {
     setShowCountdown(false);
-    if (leftChoice === "YES" && rightChoice === "YES") setOutcome("match");
-    else if (leftChoice === "NO" && rightChoice === "NO") setOutcome("no-match");
-    else setOutcome("mismatch");
+    if (leftChoice === "YES" && rightChoice === "YES") {
+      setOutcome("match");
+      sound.playCelebration();
+    } else if (leftChoice === "NO" && rightChoice === "NO") {
+      setOutcome("no-match");
+      sound.playWahWah();
+    } else {
+      setOutcome("mismatch");
+      sound.playWahWah();
+    }
     setShowOutcome(true);
   };
 
-  // Match phase progression: approach → peck → celebrate
   useEffect(() => {
     if (outcome !== "match") {
       setMatchPhase(null);
@@ -67,26 +93,49 @@ const Index = () => {
     setNoDodgeCount(0);
     setShakeRight(false);
     setShowCountdown(false);
+    setShowIntro(false);
+    setIntroComplete(true); // skip intro on replay
   };
 
   const backToSelect = () => {
     reset();
     setCharacter(null);
+    setIntroComplete(false);
   };
 
   const backToNames = () => {
     reset();
     setCharacter(null);
+    setIntroComplete(false);
     setYourName("");
     setTheirName("");
   };
 
   if (!yourName || !theirName) {
-    return <NameEntry onSubmit={(y, t) => { setYourName(y); setTheirName(t); }} />;
+    return (
+      <>
+        <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
+        <NameEntry onSubmit={(y, t) => { setYourName(y); setTheirName(t); sound.playBloop(); }} />
+      </>
+    );
   }
 
   if (!character) {
-    return <CharacterSelect onSelect={setCharacter} />;
+    return (
+      <>
+        <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
+        <CharacterSelect onSelect={handleCharacterSelect} />
+      </>
+    );
+  }
+
+  if (showIntro) {
+    return (
+      <>
+        <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
+        <IntroSequence character={character} yourName={yourName} onComplete={handleIntroComplete} />
+      </>
+    );
   }
 
   const bothChosen = leftChoice !== null && rightChoice !== null;
@@ -94,9 +143,6 @@ const Index = () => {
 
   const CharacterComponent = character === "alpaca" ? PixelAlpaca : character === "dino" ? PixelDino : PixelPanda;
 
-  // Calculate approach distance to make sprites touch
-  // Alpaca: 12 cols × 12px = 144px wide; Dino: 15 cols × 8px = 120px wide
-  // Gap is ~48-80px depending on viewport. We close the gap fully for peck.
   const approachDist = character === "alpaca" ? 55 : character === "dino" ? 48 : 55;
   const celebrating = matchPhase === "celebrating";
 
@@ -105,7 +151,8 @@ const Index = () => {
       className="min-h-screen flex flex-col items-center justify-center px-4 py-8 overflow-hidden relative"
       style={{ fontFamily: "'Patrick Hand', cursive" }}
     >
-      {showCountdown && <CountdownOverlay onComplete={handleCountdownComplete} />}
+      <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
+      {showCountdown && <CountdownOverlay onComplete={handleCountdownComplete} onTick={sound.playCountdown} />}
       {matchPhase === "celebrating" && <ConfettiHearts />}
 
       <motion.h1
@@ -118,7 +165,7 @@ const Index = () => {
       </motion.h1>
 
       <div className="flex flex-col sm:flex-row items-center sm:items-end gap-8 sm:gap-12 md:gap-20">
-        {/* Left side - Green character ("ME") */}
+        {/* Left side - Green character */}
         <motion.div
           className="flex flex-col items-center gap-4"
           animate={
@@ -135,12 +182,8 @@ const Index = () => {
           transition={{ duration: 0.8, ease: "easeInOut" }}
         >
           <motion.div
-            animate={
-              celebrating ? { y: [0, -15, 0] } : {}
-            }
-            transition={
-              celebrating ? { repeat: Infinity, duration: 0.5 } : {}
-            }
+            animate={celebrating ? { y: [0, -15, 0] } : {}}
+            transition={celebrating ? { repeat: Infinity, duration: 0.5 } : {}}
           >
             <CharacterComponent
               color="green"
@@ -151,8 +194,8 @@ const Index = () => {
             <div className="flex flex-col items-center gap-2">
               <span className="text-xl text-foreground tracking-wide">{yourName}</span>
               <div className="flex gap-3">
-                <ChoiceButton label="NO" color="green" selected={leftChoice === "NO"} onClick={() => setLeftChoice("NO")} disabled={bothChosen} />
-                <ChoiceButton label="YES" color="green" selected={leftChoice === "YES"} onClick={() => setLeftChoice("YES")} disabled={bothChosen} />
+                <ChoiceButton label="NO" color="green" selected={leftChoice === "NO"} onClick={() => { setLeftChoice("NO"); sound.playBloop(); }} disabled={bothChosen} />
+                <ChoiceButton label="YES" color="green" selected={leftChoice === "YES"} onClick={() => { setLeftChoice("YES"); sound.playDing(); }} disabled={bothChosen} />
               </div>
             </div>
           )}
@@ -173,7 +216,7 @@ const Index = () => {
           )}
         </AnimatePresence>
 
-        {/* Right side - Pink character ("YOU") */}
+        {/* Right side - Pink character */}
         <motion.div
           className="flex flex-col items-center gap-4"
           animate={
@@ -218,7 +261,7 @@ const Index = () => {
               <div className="flex gap-3 items-center">
                 <motion.div
                   animate={{
-                    scale: noDodgeCount >= 4 ? 1.5 : noDodgeCount >= 3 ? 1.2 : 1,
+                    scale: noDodgeCount >= 5 ? 2 : noDodgeCount >= 4 ? 1.5 : noDodgeCount >= 3 ? 1.2 : 1,
                     boxShadow: noDodgeCount >= 4
                       ? "0 0 20px hsl(var(--alpaca-pink)), 0 0 40px hsl(var(--alpaca-pink))"
                       : "none",
@@ -230,26 +273,20 @@ const Index = () => {
                     label="YES"
                     color="pink"
                     selected={rightChoice === "YES"}
-                    onClick={() => setRightChoice("YES")}
+                    onClick={() => { setRightChoice("YES"); sound.playDing(); }}
                     disabled={bothChosen}
                   />
                 </motion.div>
-                {noDodgeCount >= 4 && (
-                  <motion.div
-                    className="absolute -top-2 -right-2 text-xs"
-                    animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
-                    transition={{ repeat: Infinity, duration: 1.5 }}
-                  />
-                )}
                 <DodgeNoButton
                   color="pink"
                   selected={rightChoice === "NO"}
-                  onClick={() => setRightChoice("NO")}
+                  onClick={() => { setRightChoice("NO"); sound.playBloop(); }}
                   disabled={bothChosen}
                   dodgeCount={noDodgeCount}
                   onDodge={() => {
                     setNoDodgeCount((c) => c + 1);
                     setShakeRight(true);
+                    sound.playDodge();
                   }}
                 />
               </div>
@@ -258,7 +295,7 @@ const Index = () => {
         </motion.div>
       </div>
 
-      {/* Outcome message */}
+      {/* Outcome */}
       <AnimatePresence>
         {showOutcome && (
           outcome === "match" ? (
