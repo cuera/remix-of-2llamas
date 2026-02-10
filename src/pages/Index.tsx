@@ -6,6 +6,7 @@ import PixelPanda from "@/components/PixelPanda";
 import ChoiceButton from "@/components/ChoiceButton";
 import ConfettiHearts from "@/components/ConfettiHearts";
 import CharacterSelect, { type CharacterType } from "@/components/CharacterSelect";
+import MatchCertificate from "@/components/MatchCertificate";
 import NameEntry from "@/components/NameEntry";
 import DodgeNoButton from "@/components/DodgeNoButton";
 import CountdownOverlay from "@/components/CountdownOverlay";
@@ -260,42 +261,43 @@ const Index = () => {
       {/* Outcome message */}
       <AnimatePresence>
         {showOutcome && (
-          <motion.div
-            className="mt-10 flex flex-col items-center gap-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: outcome === "match" ? 1.2 : 0.5 }}
-          >
-            {outcome === "match" ? (
-              <div className="flex flex-col items-center gap-2">
-                <p className="text-3xl sm:text-4xl text-foreground text-center">
-                  {yourName} ❤️ {theirName}
-                </p>
-                <p className="text-xl sm:text-2xl text-muted-foreground">Valentine's Day 2026</p>
-              </div>
-            ) : (
+          outcome === "match" ? (
+            <MatchCertificate
+              yourName={yourName}
+              theirName={theirName}
+              character={character}
+              onPlayAgain={reset}
+              onSwitchCharacters={backToSelect}
+            />
+          ) : (
+            <motion.div
+              className="mt-10 flex flex-col items-center gap-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
               <p className="text-3xl sm:text-4xl text-foreground text-center">
                 {outcome === "no-match" && "Maybe next time... 💔"}
                 {outcome === "mismatch" && "Awkward... 😅"}
               </p>
-            )}
-            <div className="flex gap-4">
-              <button
-                onClick={reset}
-                className="px-8 py-3 text-xl rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95"
-                style={{ borderColor: "hsl(var(--primary))" }}
-              >
-                Play Again 🔄
-              </button>
-              <button
-                onClick={backToSelect}
-                className="px-8 py-3 text-xl rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95"
-                style={{ borderColor: "hsl(var(--accent))" }}
-              >
-                Switch Characters 🔀
-              </button>
-            </div>
-          </motion.div>
+              <div className="flex gap-4">
+                <button
+                  onClick={reset}
+                  className="px-8 py-3 text-xl rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95"
+                  style={{ borderColor: "hsl(var(--primary))" }}
+                >
+                  Play Again 🔄
+                </button>
+                <button
+                  onClick={backToSelect}
+                  className="px-8 py-3 text-xl rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95"
+                  style={{ borderColor: "hsl(var(--accent))" }}
+                >
+                  Switch Characters 🔀
+                </button>
+              </div>
+            </motion.div>
+          )
         )}
       </AnimatePresence>
 
