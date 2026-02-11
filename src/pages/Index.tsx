@@ -21,6 +21,7 @@ type MatchPhase = "approaching" | "pecking" | "celebrating";
 const Index = () => {
   const [yourName, setYourName] = useState("");
   const [theirName, setTheirName] = useState("");
+  const [loveNote, setLoveNote] = useState("");
   const [character, setCharacter] = useState<CharacterType | null>(null);
   const [showIntro, setShowIntro] = useState(false);
   const [introComplete, setIntroComplete] = useState(false);
@@ -109,13 +110,14 @@ const Index = () => {
     setIntroComplete(false);
     setYourName("");
     setTheirName("");
+    setLoveNote("");
   };
 
   if (!yourName || !theirName) {
     return (
       <>
         <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
-        <NameEntry onSubmit={(y, t) => { setYourName(y); setTheirName(t); sound.playBloop(); }} />
+        <NameEntry onSubmit={(y, t, note) => { setYourName(y); setTheirName(t); setLoveNote(note); sound.playBloop(); }} />
       </>
     );
   }

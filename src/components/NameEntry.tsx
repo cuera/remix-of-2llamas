@@ -1,20 +1,24 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface NameEntryProps {
-  onSubmit: (yourName: string, theirName: string) => void;
+  onSubmit: (yourName: string, theirName: string, loveNote: string) => void;
 }
 
 const NameEntry = ({ onSubmit }: NameEntryProps) => {
   const [yourName, setYourName] = useState("");
   const [theirName, setTheirName] = useState("");
+  const [loveNote, setLoveNote] = useState("");
+  const [noteOpen, setNoteOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (yourName.trim() && theirName.trim()) {
-      onSubmit(yourName.trim(), theirName.trim());
+      onSubmit(yourName.trim(), theirName.trim(), loveNote.trim());
     }
   };
+
+  const isValid = yourName.trim().length > 0 && theirName.trim().length > 0;
 
   return (
     <div
@@ -63,11 +67,49 @@ const NameEntry = ({ onSubmit }: NameEntryProps) => {
           />
         </div>
 
+        {/* Collapsible love note */}
+        <div className="w-full">
+          <button
+            type="button"
+            onClick={() => setNoteOpen(!noteOpen)}
+            className="text-base transition-colors hover:opacity-80"
+            style={{ color: "#9B8BB4" }}
+          >
+            Add a love note (optional) {noteOpen ? "▴" : "▾"}
+          </button>
+          <AnimatePresence>
+            {noteOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <div className="mt-2 flex flex-col gap-1">
+                  <textarea
+                    placeholder="Hey, been wanting to ask you this..."
+                    value={loveNote}
+                    onChange={(e) => setLoveNote(e.target.value.slice(0, 100))}
+                    maxLength={100}
+                    rows={3}
+                    className="w-full px-4 py-3 text-xl rounded-lg border-[3px] border-border bg-card/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors resize-none"
+                  />
+                  <span className="text-sm self-end" style={{ color: "#9B8BB4" }}>
+                    {loveNote.length}/100
+                  </span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         <motion.button
           type="submit"
-          className="px-10 py-3 text-2xl rounded-lg border-[3px] border-primary text-foreground transition-all hover:scale-105 active:scale-95 mt-2"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          disabled={!isValid}
+          className="px-10 py-3 text-2xl rounded-lg border-[3px] border-primary text-foreground transition-all hover:scale-105 active:scale-95 mt-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+          whileHover={isValid ? { scale: 1.05 } : {}}
+          whileTap={isValid ? { scale: 0.95 } : {}}
         >
           Next 💘
         </motion.button>
