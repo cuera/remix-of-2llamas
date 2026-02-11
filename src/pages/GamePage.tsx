@@ -120,6 +120,16 @@ const GamePage = () => {
   const approachDist = character === "alpaca" ? 55 : character === "dino" ? 48 : 55;
   const celebrating = matchPhase === "celebrating";
 
+  const DODGE_TEXTS = [
+    "",
+    "Really? 🥺",
+    "But look at us... 💕",
+    "Pookie please... 🥺",
+    "I'll be so sad... 😢",
+    "Fine... but you're missing out 💔",
+  ];
+  const dodgeText = DODGE_TEXTS[Math.min(noDodgeCount, DODGE_TEXTS.length - 1)];
+
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4 py-8 overflow-hidden relative"
@@ -152,8 +162,22 @@ const GamePage = () => {
           transition={{ duration: 0.8, ease: "easeInOut" }}
         >
           <motion.div
-            animate={celebrating ? { y: [0, -15, 0] } : { y: [0, -6, 0] }}
-            transition={celebrating ? { repeat: Infinity, duration: 0.5 } : { repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+            animate={
+              celebrating
+                ? { y: [0, -15, 0], rotate: 0 }
+                : noDodgeCount >= 3
+                ? { y: [0, -8, 0], rotate: -5 }
+                : noDodgeCount >= 1
+                ? { y: [0, -6, 0], rotate: -5 }
+                : { y: [0, -6, 0], rotate: 0 }
+            }
+            transition={
+              celebrating
+                ? { repeat: Infinity, duration: 0.5 }
+                : noDodgeCount >= 3
+                ? { repeat: Infinity, duration: 0.6, ease: "easeInOut" }
+                : { repeat: Infinity, duration: 1.5, ease: "easeInOut" }
+            }
           >
             <CharacterComponent color="green" />
           </motion.div>
@@ -219,9 +243,9 @@ const GamePage = () => {
               <div className="flex gap-3 items-center">
                 <motion.div
                   animate={{
-                    scale: noDodgeCount >= 5 ? 2 : noDodgeCount >= 4 ? 1.5 : noDodgeCount >= 3 ? 1.2 : 1,
+                    scale: noDodgeCount >= 5 ? 1.6 : noDodgeCount >= 4 ? 1.4 : noDodgeCount >= 3 ? 1.2 : noDodgeCount >= 2 ? 1.1 : 1,
                     boxShadow: noDodgeCount >= 4
-                      ? "0 0 20px #4ADE80, 0 0 40px #4ADE80"
+                      ? "0 0 20px #E91E8B, 0 0 40px #E91E8B"
                       : "none",
                   }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -260,6 +284,21 @@ const GamePage = () => {
                   }}
                 />
               </div>
+              <AnimatePresence>
+                {noDodgeCount > 0 && (
+                  <motion.p
+                    key={noDodgeCount}
+                    className="text-sm mt-1"
+                    style={{ color: "#E91E8B", fontFamily: "'Patrick Hand', cursive" }}
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {dodgeText}
+                  </motion.p>
+                )}
+              </AnimatePresence>
             </div>
           )}
         </motion.div>
