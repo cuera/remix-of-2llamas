@@ -16,6 +16,8 @@ const characters: { type: CharacterType; label: string; emoji: string }[] = [
   { type: "panda", label: "Pandas", emoji: "🐼" },
 ];
 
+const SPRING = { type: "spring" as const, damping: 15, stiffness: 120 };
+
 const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
   const [selected, setSelected] = useState<CharacterType | null>(null);
 
@@ -25,7 +27,7 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
         className="text-4xl sm:text-5xl md:text-6xl text-foreground mb-4 text-center"
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 200, damping: 15 }}
+        transition={SPRING}
       >
         BE MY VALENTINE?
       </motion.h1>
@@ -43,7 +45,7 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
         {characters.map((char, i) => (
           <motion.button
             key={char.type}
-            className={`flex flex-col items-center gap-4 p-6 rounded-xl border-[3px] bg-card/50 transition-colors cursor-pointer ${
+            className={`flex flex-col items-center gap-4 p-6 rounded-xl border-[3px] bg-card/50 transition-colors cursor-pointer min-h-[48px] ${
               selected === char.type ? "border-primary" : "border-border hover:border-primary"
             }`}
             initial={{ y: 30, opacity: 0 }}
@@ -79,8 +81,7 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
       </div>
 
       <motion.button
-        className="mt-10 w-full max-w-sm py-4 text-2xl rounded-lg text-white font-bold transition-all hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
-        style={{ backgroundColor: "#E91E8B" }}
+        className="mt-10 w-full max-w-sm py-4 text-2xl rounded-lg text-primary-foreground font-bold transition-all hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 bg-primary min-h-[48px]"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.7 }}

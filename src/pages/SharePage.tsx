@@ -2,6 +2,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import ShareScreen from "@/components/ShareScreen";
 import SoundToggle from "@/components/SoundToggle";
+import BackButton from "@/components/BackButton";
+import PageTransition from "@/components/PageTransition";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 import type { CharacterType } from "@/components/CharacterSelect";
 
@@ -35,8 +37,9 @@ const SharePage = () => {
   };
 
   return (
-    <>
+    <PageTransition>
       <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
+      <BackButton to="/create" />
       <ShareScreen
         yourName={state.yourName}
         theirName={state.theirName}
@@ -45,7 +48,7 @@ const SharePage = () => {
         onSendAnother={handleSendAnother}
         onPreviewAsReceiver={handlePreviewAsReceiver}
       />
-    </>
+    </PageTransition>
   );
 };
 

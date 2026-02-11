@@ -14,6 +14,8 @@ interface MatchCertificateProps {
   onSwitchCharacters: () => void;
 }
 
+const SPRING = { type: "spring" as const, damping: 15, stiffness: 120 };
+
 const MatchCertificate = ({
   yourName,
   theirName,
@@ -35,7 +37,7 @@ const MatchCertificate = ({
     try {
       const dataUrl = await toPng(cardRef.current, {
         pixelRatio: 3,
-        backgroundColor: "#1a0a1e",
+        backgroundColor: "hsl(270, 40%, 17%)",
       });
       const link = document.createElement("a");
       link.download = `valentine-${yourName}-${theirName}.png`;
@@ -47,7 +49,7 @@ const MatchCertificate = ({
   }, [yourName, theirName]);
 
   const buttonBase =
-    "px-7 py-3 text-lg rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95";
+    "px-7 py-3 text-lg rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95 min-h-[48px]";
 
   return (
     <motion.div
@@ -89,7 +91,7 @@ const MatchCertificate = ({
         <div
           className="w-full flex flex-col items-center gap-3 py-6 px-4 mb-5"
           style={{
-            background: "linear-gradient(180deg, hsl(276 45% 22%) 0%, hsl(276 40% 18%) 100%)",
+            background: "linear-gradient(180deg, hsl(270, 40%, 17%) 0%, hsl(270, 35%, 14%) 100%)",
             borderRadius: "3px",
             boxShadow: "inset 0 2px 8px rgba(0,0,0,0.3)",
           }}
@@ -119,8 +121,8 @@ const MatchCertificate = ({
           <p
             className="text-2xl sm:text-3xl font-bold tracking-wide"
             style={{
-              color: "hsl(330, 80%, 70%)",
-              textShadow: "0 0 20px hsla(330, 80%, 65%, 0.5)",
+              color: "hsl(var(--alpaca-pink))",
+              textShadow: "0 0 20px hsla(330, 80%, 51%, 0.5)",
             }}
           >
             It's a match!
@@ -130,22 +132,22 @@ const MatchCertificate = ({
         {/* Names */}
         <p
           className="text-2xl sm:text-3xl text-center font-bold tracking-wide"
-          style={{ color: "hsl(330, 80%, 65%)" }}
+          style={{ color: "hsl(var(--alpaca-pink))" }}
         >
           {yourName} ❤️ {theirName}
         </p>
 
         {/* Date */}
         <p
-          className="text-base sm:text-lg mt-1 tracking-widest uppercase"
-          style={{ color: "hsl(276, 20%, 50%)", letterSpacing: "0.15em" }}
+          className="text-base sm:text-lg mt-1 tracking-widest uppercase text-muted-foreground"
+          style={{ letterSpacing: "0.15em", color: "hsl(270, 20%, 50%)" }}
         >
           Valentine's Day 2026
         </p>
 
         <p
           className="mt-3 text-xs tracking-wider"
-          style={{ color: "hsl(276, 15%, 62%)", letterSpacing: "0.1em" }}
+          style={{ color: "hsl(270, 15%, 62%)", letterSpacing: "0.1em" }}
         >
           valentine-alpaca.lovable.app
         </p>
@@ -161,7 +163,7 @@ const MatchCertificate = ({
         <motion.button
           onClick={handleDownload}
           className={buttonBase}
-          style={{ borderColor: "#E91E8B" }}
+          style={{ borderColor: "hsl(var(--primary))" }}
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.8 }}
@@ -174,7 +176,7 @@ const MatchCertificate = ({
         <motion.button
           onClick={() => navigate("/create", { replace: true })}
           className={buttonBase}
-          style={{ borderColor: "#4ADE80" }}
+          style={{ borderColor: "hsl(var(--alpaca-green))" }}
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 2.0 }}

@@ -69,12 +69,11 @@ const ShareScreen = ({
       className="min-h-screen flex flex-col items-center justify-center px-4 py-8"
       style={{ fontFamily: "'Patrick Hand', cursive" }}
     >
-      {/* Title */}
       <motion.h1
         className="text-3xl sm:text-4xl text-foreground mb-2 text-center"
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 200, damping: 15 }}
+        transition={{ type: "spring", damping: 15, stiffness: 120 }}
       >
         Your valentine for {theirName} is ready! 💌
       </motion.h1>
@@ -89,11 +88,7 @@ const ShareScreen = ({
 
       {/* Preview Card */}
       <motion.div
-        className="w-full max-w-sm rounded-xl border-2 p-6 flex flex-col items-center gap-4 mb-6"
-        style={{
-          backgroundColor: "#1a1a2e",
-          borderColor: "hsl(270 30% 40%)",
-        }}
+        className="w-full max-w-sm rounded-xl border-2 border-border p-6 flex flex-col items-center gap-4 mb-6 bg-card"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3 }}
@@ -111,8 +106,7 @@ const ShareScreen = ({
 
       {/* Share Link Box */}
       <motion.div
-        className="w-full max-w-sm rounded-lg flex items-center justify-between px-4 py-3 mb-6"
-        style={{ backgroundColor: "#1a1a2e" }}
+        className="w-full max-w-sm rounded-lg flex items-center justify-between px-4 py-3 mb-6 bg-card"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4 }}
@@ -122,14 +116,14 @@ const ShareScreen = ({
         </span>
         <button
           onClick={handleCopy}
-          className="text-xl hover:scale-110 active:scale-95 transition-transform shrink-0"
+          className="text-xl hover:scale-110 active:scale-95 transition-transform shrink-0 min-h-[48px] min-w-[48px] flex items-center justify-center"
           title="Copy link"
         >
           📋
         </button>
       </motion.div>
 
-      {/* Share Buttons */}
+      {/* Share Buttons - stack on mobile */}
       <motion.div
         className="w-full max-w-sm flex flex-col sm:flex-row gap-3 mb-6"
         initial={{ y: 20, opacity: 0 }}
@@ -138,22 +132,21 @@ const ShareScreen = ({
       >
         <button
           onClick={handleWhatsApp}
-          className="flex-1 py-3 text-lg rounded-lg border-2 text-foreground transition-all hover:scale-105 active:scale-95"
+          className="flex-1 py-3 text-lg rounded-lg border-2 text-foreground transition-all hover:scale-105 active:scale-95 min-h-[48px]"
           style={{ borderColor: "#25D366" }}
         >
           💬 WhatsApp
         </button>
         <button
           onClick={() => setShowQR(!showQR)}
-          className="flex-1 py-3 text-lg rounded-lg border-2 text-foreground transition-all hover:scale-105 active:scale-95"
-          style={{ borderColor: "hsl(270 50% 55%)" }}
+          className="flex-1 py-3 text-lg rounded-lg border-2 border-border text-foreground transition-all hover:scale-105 active:scale-95 min-h-[48px]"
         >
           📱 {showQR ? "Hide QR" : "Show QR"}
         </button>
         <button
           onClick={handleShare}
-          className="flex-1 py-3 text-lg rounded-lg border-2 text-foreground transition-all hover:scale-105 active:scale-95"
-          style={{ borderColor: "#E91E8B" }}
+          className="flex-1 py-3 text-lg rounded-lg border-2 text-foreground transition-all hover:scale-105 active:scale-95 min-h-[48px]"
+          style={{ borderColor: "hsl(var(--primary))" }}
         >
           📤 Share
         </button>
@@ -162,13 +155,12 @@ const ShareScreen = ({
       {/* QR Placeholder */}
       {showQR && (
         <motion.div
-          className="w-40 h-40 rounded-lg mb-6 flex items-center justify-center"
-          style={{ backgroundColor: "white" }}
+          className="w-40 h-40 rounded-lg mb-6 flex items-center justify-center bg-white"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          transition={{ type: "spring", damping: 15, stiffness: 120 }}
         >
-          <span className="text-muted-foreground text-sm text-center px-2" style={{ color: "#666" }}>
+          <span className="text-sm text-center px-2" style={{ color: "#666" }}>
             QR Code
           </span>
         </motion.div>
@@ -195,26 +187,24 @@ const ShareScreen = ({
       >
         <button
           onClick={onSendAnother}
-          className="px-8 py-3 text-xl rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95"
-          style={{ borderColor: "hsl(var(--primary))" }}
+          className="px-8 py-3 text-xl rounded-lg border-[3px] border-primary text-foreground transition-all hover:scale-105 active:scale-95 min-h-[48px]"
         >
           💌 Send Another Valentine
         </button>
         <button
           onClick={onPreviewAsReceiver}
-          className="text-sm transition-colors hover:opacity-80"
-          style={{ color: "#9B8BB4" }}
+          className="text-sm transition-colors hover:opacity-80 text-muted-foreground min-h-[48px]"
         >
           👀 Preview as Receiver
         </button>
       </motion.div>
 
-      {/* Background hearts */}
+      {/* Background hearts - fewer on mobile */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute text-2xl opacity-20"
+            className={`absolute text-2xl opacity-20 ${i >= 4 ? "hidden sm:block" : ""}`}
             style={{ left: `${15 + i * 15}%`, top: `${20 + (i % 3) * 25}%` }}
             animate={{ y: [0, -20, 0], rotate: [0, 10, -10, 0] }}
             transition={{ repeat: Infinity, duration: 3 + i * 0.5, delay: i * 0.7, ease: "easeInOut" }}
