@@ -7,6 +7,7 @@ interface DodgeNoButtonProps {
   disabled: boolean;
   dodgeCount: number;
   onDodge: () => void;
+  customStyle?: React.CSSProperties;
 }
 
 const DODGE_LABELS = [
@@ -18,9 +19,10 @@ const DODGE_LABELS = [
   "...",
 ];
 
-const DodgeNoButton = ({ color, selected, onClick, disabled, dodgeCount, onDodge }: DodgeNoButtonProps) => {
-  const borderColor = color === "green" ? "hsl(var(--alpaca-green))" : "hsl(var(--alpaca-pink))";
-  const bgColor = selected ? borderColor : "transparent";
+const DodgeNoButton = ({ color, selected, onClick, disabled, dodgeCount, onDodge, customStyle }: DodgeNoButtonProps) => {
+  const defaultBorder = color === "green" ? "hsl(var(--alpaca-green))" : "hsl(var(--alpaca-pink))";
+  const borderColor = customStyle?.borderColor ?? defaultBorder;
+  const bgColor = selected ? (borderColor as string) : "transparent";
   const textColor = selected ? "hsl(var(--background))" : "hsl(var(--foreground))";
 
   const label = DODGE_LABELS[Math.min(dodgeCount, DODGE_LABELS.length - 1)];
@@ -55,7 +57,9 @@ const DodgeNoButton = ({ color, selected, onClick, disabled, dodgeCount, onDodge
         backgroundColor: bgColor,
         color: textColor,
         fontFamily: "'Patrick Hand', cursive",
-        fontSize: dodgeCount >= 4 ? "0.7rem" : undefined,
+        fontSize: dodgeCount >= 4 ? "0.7rem" : customStyle?.fontSize ?? undefined,
+        padding: customStyle?.padding,
+        opacity: customStyle?.opacity,
       }}
       animate={{
         x: xOffset,
