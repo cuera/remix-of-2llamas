@@ -27,11 +27,11 @@ const DodgeNoButton = ({ color, selected, onClick, disabled, dodgeCount, onDodge
 
   const label = DODGE_LABELS[Math.min(dodgeCount, DODGE_LABELS.length - 1)];
 
-  // Progressive shrinking: becomes a dot at step 5
+  // Progressive shrinking
   const scale = dodgeCount >= 5 ? 0.3 : dodgeCount >= 4 ? 0.5 : dodgeCount >= 3 ? 0.7 : 1;
-  const opacity = dodgeCount >= 5 ? 0.2 : dodgeCount >= 4 ? 0.3 : 1;
-  // Slide right progressively
-  const xOffset = dodgeCount >= 5 ? 120 : dodgeCount >= 4 ? 90 : dodgeCount >= 3 ? 70 : dodgeCount >= 2 ? 50 : dodgeCount >= 1 ? 30 : 0;
+  const opacity = dodgeCount >= 5 ? 0.3 : dodgeCount >= 4 ? 0.5 : 1;
+  // Slide right 40px per attempt
+  const xOffset = dodgeCount * 40;
 
   const handleInteraction = () => {
     if (disabled) return;
