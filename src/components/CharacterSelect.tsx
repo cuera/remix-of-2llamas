@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import PixelAlpaca from "./PixelAlpaca";
 import PixelDino from "./PixelDino";
@@ -16,6 +17,8 @@ const characters: { type: CharacterType; label: string; emoji: string }[] = [
 ];
 
 const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
+  const [selected, setSelected] = useState<CharacterType | null>(null);
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
       <motion.h1
@@ -40,13 +43,15 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
         {characters.map((char, i) => (
           <motion.button
             key={char.type}
-            className="flex flex-col items-center gap-4 p-6 rounded-xl border-[3px] border-border bg-card/50 hover:border-primary transition-colors cursor-pointer"
+            className={`flex flex-col items-center gap-4 p-6 rounded-xl border-[3px] bg-card/50 transition-colors cursor-pointer ${
+              selected === char.type ? "border-primary" : "border-border hover:border-primary"
+            }`}
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 + i * 0.15 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => onSelect(char.type)}
+            onClick={() => setSelected(char.type)}
           >
             <div className="flex items-end gap-3">
               {char.type === "alpaca" ? (
@@ -72,6 +77,20 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
           </motion.button>
         ))}
       </div>
+
+      <motion.button
+        className="mt-10 w-full max-w-sm py-4 text-2xl rounded-lg text-white font-bold transition-all hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+        style={{ backgroundColor: "#E91E8B" }}
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.7 }}
+        whileHover={selected ? { scale: 1.05 } : {}}
+        whileTap={selected ? { scale: 0.95 } : {}}
+        disabled={!selected}
+        onClick={() => selected && onSelect(selected)}
+      >
+        Create & Share 💝
+      </motion.button>
     </div>
   );
 };
