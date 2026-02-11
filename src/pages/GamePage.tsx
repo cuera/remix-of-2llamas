@@ -110,7 +110,7 @@ const GamePage = () => {
     return (
       <>
         <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
-        <IntroSequence character={character} yourName={yourName} onComplete={handleIntroComplete} />
+        <IntroSequence character={character} yourName={yourName} loveNote={state.loveNote} onComplete={handleIntroComplete} />
       </>
     );
   }
