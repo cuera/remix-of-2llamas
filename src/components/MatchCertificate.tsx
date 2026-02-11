@@ -1,4 +1,5 @@
 import { useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toPng } from "html-to-image";
 import PixelAlpaca from "./PixelAlpaca";
@@ -10,7 +11,6 @@ interface MatchCertificateProps {
   yourName: string;
   theirName: string;
   character: CharacterType;
-  onPlayAgain: () => void;
   onSwitchCharacters: () => void;
 }
 
@@ -18,10 +18,10 @@ const MatchCertificate = ({
   yourName,
   theirName,
   character,
-  onPlayAgain,
   onSwitchCharacters,
 }: MatchCertificateProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   const CharacterComponent =
     character === "alpaca"
@@ -46,37 +46,8 @@ const MatchCertificate = ({
     }
   }, [yourName, theirName]);
 
-  const handleShareStories = useCallback(async () => {
-    if (!cardRef.current) return;
-    try {
-      const dataUrl = await toPng(cardRef.current, {
-        pixelRatio: 3,
-        backgroundColor: "#1a0a1e",
-      });
-      // Convert to blob for share API
-      const res = await fetch(dataUrl);
-      const blob = await res.blob();
-      const file = new File([blob], `valentine-${yourName}-${theirName}.png`, {
-        type: "image/png",
-      });
-
-      if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({
-          title: `${yourName} ❤️ ${theirName} — Valentine's Day 2026`,
-          text: `It's a match! ${yourName} ❤️ ${theirName}`,
-          files: [file],
-        });
-      } else {
-        // Fallback: download the image
-        handleDownload();
-      }
-    } catch (err) {
-      if ((err as Error).name !== "AbortError") {
-        console.error("Share failed:", err);
-        handleDownload();
-      }
-    }
-  }, [yourName, theirName, handleDownload]);
+  const buttonBase =
+    "px-7 py-3 text-lg rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95";
 
   return (
     <motion.div
@@ -84,6 +55,7 @@ const MatchCertificate = ({
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 1.2, duration: 0.6 }}
+      style={{ fontFamily: "'Patrick Hand', cursive" }}
     >
       {/* Polaroid Card */}
       <div
@@ -100,7 +72,7 @@ const MatchCertificate = ({
           padding: "32px 32px 28px",
         }}
       >
-        {/* Tape effect top */}
+        {/* Tape */}
         <div
           className="absolute -top-3 left-1/2 -translate-x-1/2"
           style={{
@@ -122,7 +94,6 @@ const MatchCertificate = ({
             boxShadow: "inset 0 2px 8px rgba(0,0,0,0.3)",
           }}
         >
-          {/* Characters */}
           <div className="flex items-end gap-2">
             <motion.div
               animate={{ y: [0, -8, 0] }}
@@ -145,13 +116,11 @@ const MatchCertificate = ({
             </motion.div>
           </div>
 
-          {/* It's a match! */}
           <p
             className="text-2xl sm:text-3xl font-bold tracking-wide"
             style={{
               color: "hsl(330, 80%, 70%)",
               textShadow: "0 0 20px hsla(330, 80%, 65%, 0.5)",
-              fontFamily: "'Patrick Hand', cursive",
             }}
           >
             It's a match!
@@ -161,91 +130,72 @@ const MatchCertificate = ({
         {/* Names */}
         <p
           className="text-2xl sm:text-3xl text-center font-bold tracking-wide"
-          style={{
-            color: "hsl(276, 40%, 25%)",
-            fontFamily: "'Patrick Hand', cursive",
-          }}
+          style={{ color: "hsl(330, 80%, 65%)" }}
         >
           {yourName} ❤️ {theirName}
         </p>
 
-        {/* Date stamp */}
+        {/* Date */}
         <p
           className="text-base sm:text-lg mt-1 tracking-widest uppercase"
-          style={{
-            color: "hsl(276, 20%, 50%)",
-            fontFamily: "'Patrick Hand', cursive",
-            letterSpacing: "0.15em",
-          }}
+          style={{ color: "hsl(276, 20%, 50%)", letterSpacing: "0.15em" }}
         >
           Valentine's Day 2026
         </p>
 
-        {/* App URL watermark */}
         <p
           className="mt-3 text-xs tracking-wider"
-          style={{
-            color: "hsl(276, 15%, 62%)",
-            fontFamily: "'Patrick Hand', cursive",
-            letterSpacing: "0.1em",
-          }}
+          style={{ color: "hsl(276, 15%, 62%)", letterSpacing: "0.1em" }}
         >
           valentine-alpaca.lovable.app
         </p>
 
-        {/* Decorative corner hearts */}
         <span className="absolute top-3 left-3 text-sm opacity-30">💕</span>
         <span className="absolute top-3 right-3 text-sm opacity-30">💕</span>
         <span className="absolute bottom-3 left-3 text-sm opacity-30">💕</span>
         <span className="absolute bottom-3 right-3 text-sm opacity-30">💕</span>
       </div>
 
-      {/* Action buttons */}
+      {/* Staggered buttons */}
       <div className="flex flex-col items-center gap-3 mt-2">
-        <div className="flex flex-col sm:flex-row gap-3 items-center">
-          <motion.button
-            onClick={handleDownload}
-            className="px-8 py-3 text-xl rounded-lg text-white transition-all"
-            style={{
-              background: "linear-gradient(135deg, hsl(330, 80%, 55%), hsl(340, 90%, 65%))",
-              boxShadow: "0 4px 15px hsla(330, 80%, 55%, 0.4)",
-            }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Download Card 📸
-          </motion.button>
+        <motion.button
+          onClick={handleDownload}
+          className={buttonBase}
+          style={{ borderColor: "#E91E8B" }}
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.8 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          📸 Download Card
+        </motion.button>
 
-          <motion.button
-            onClick={handleShareStories}
-            className="px-8 py-3 text-xl rounded-lg text-white transition-all"
-            style={{
-              background: "linear-gradient(135deg, hsl(280, 70%, 50%), hsl(320, 80%, 55%))",
-              boxShadow: "0 4px 15px hsla(280, 70%, 50%, 0.4)",
-            }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Share to Stories 📱
-          </motion.button>
-        </div>
+        <motion.button
+          onClick={() => navigate("/create", { replace: true })}
+          className={buttonBase}
+          style={{ borderColor: "#4ADE80" }}
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.0 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          💌 Send Your Own Valentine
+        </motion.button>
 
-        <div className="flex gap-3">
-          <button
-            onClick={onPlayAgain}
-            className="px-6 py-3 text-lg rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95"
-            style={{ borderColor: "hsl(var(--primary))" }}
-          >
-            Play Again 🔄
-          </button>
-          <button
-            onClick={onSwitchCharacters}
-            className="px-6 py-3 text-lg rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95"
-            style={{ borderColor: "hsl(var(--accent))" }}
-          >
-            Switch 🔀
-          </button>
-        </div>
+        <motion.button
+          onClick={onSwitchCharacters}
+          className={buttonBase}
+          style={{ borderColor: "hsl(var(--muted-foreground))" }}
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.2 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          🔀 Switch Characters
+        </motion.button>
       </div>
     </motion.div>
   );

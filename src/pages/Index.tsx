@@ -306,35 +306,60 @@ const Index = () => {
               yourName={yourName}
               theirName={theirName}
               character={character}
-              onPlayAgain={resetGame}
               onSwitchCharacters={backToSelect}
             />
           ) : (
             <motion.div
               className="mt-10 flex flex-col items-center gap-6"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
             >
-              <p className="text-3xl sm:text-4xl text-foreground text-center">
-                Awkward... 😅
-              </p>
-              <div className="flex gap-4">
+              <motion.p
+                className="text-3xl sm:text-4xl text-foreground text-center"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                Maybe Next Time... 💔
+              </motion.p>
+              <motion.div
+                className="text-4xl"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.8, type: "spring" }}
+              >
+                💔
+              </motion.div>
+              <motion.p
+                className="text-xl text-muted-foreground text-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 2 }}
+              >
+                But hey, there's always chocolate 🍫
+              </motion.p>
+              <motion.div
+                className="flex flex-col sm:flex-row gap-3 items-center"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 2.5 }}
+              >
                 <button
-                  onClick={resetGame}
-                  className="px-8 py-3 text-xl rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95"
-                  style={{ borderColor: "hsl(var(--primary))" }}
+                  onClick={() => { window.location.href = "/create"; }}
+                  className="px-7 py-3 text-lg rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95"
+                  style={{ borderColor: "#E91E8B" }}
                 >
-                  Try Again 🔄
+                  💌 Send Your Own Valentine
                 </button>
                 <button
-                  onClick={backToSelect}
-                  className="px-8 py-3 text-xl rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95"
-                  style={{ borderColor: "hsl(var(--accent))" }}
+                  onClick={() => { window.location.href = "/"; }}
+                  className="px-7 py-3 text-lg rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95"
+                  style={{ borderColor: "hsl(var(--muted-foreground))" }}
                 >
-                  Switch Characters 🔀
+                  🔀 Try Again
                 </button>
-              </div>
+              </motion.div>
             </motion.div>
           )
         )}
