@@ -12,20 +12,20 @@ import DodgeNoButton from "@/components/DodgeNoButton";
 import CountdownOverlay from "@/components/CountdownOverlay";
 import IntroSequence from "@/components/IntroSequence";
 import SoundToggle from "@/components/SoundToggle";
+import ShareScreen from "@/components/ShareScreen";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 
 type Choice = null | "YES" | "NO";
 type Outcome = null | "match" | "no-match" | "mismatch";
 type MatchPhase = "approaching" | "pecking" | "celebrating";
+type AppPhase = "names" | "character" | "share" | "intro" | "game";
 
 const Index = () => {
   const [yourName, setYourName] = useState("");
   const [theirName, setTheirName] = useState("");
   const [loveNote, setLoveNote] = useState("");
   const [character, setCharacter] = useState<CharacterType | null>(null);
-  const [showIntro, setShowIntro] = useState(false);
-  const [introComplete, setIntroComplete] = useState(false);
-  const [leftChoice, setLeftChoice] = useState<Choice>(null);
+  const [phase, setPhase] = useState<AppPhase>("names");
   const [rightChoice, setRightChoice] = useState<Choice>(null);
   const [outcome, setOutcome] = useState<Outcome>(null);
   const [showOutcome, setShowOutcome] = useState(false);
@@ -36,34 +36,34 @@ const Index = () => {
 
   const sound = useSoundEffects();
 
-  // When character is selected, show intro
   const handleCharacterSelect = useCallback((type: CharacterType) => {
     setCharacter(type);
-    setShowIntro(true);
-    setIntroComplete(false);
+    setPhase("share");
+  }, []);
+
+  const handlePreviewAsReceiver = useCallback(() => {
+    setPhase("intro");
   }, []);
 
   const handleIntroComplete = useCallback(() => {
-    setShowIntro(false);
-    setIntroComplete(true);
+    setPhase("game");
     sound.playBloop();
   }, [sound]);
 
+  // When receiver picks, trigger countdown
   useEffect(() => {
-    if (leftChoice && rightChoice) {
+    if (rightChoice) {
       const timer = setTimeout(() => setShowCountdown(true), 400);
       return () => clearTimeout(timer);
     }
-  }, [leftChoice, rightChoice]);
+  }, [rightChoice]);
 
   const handleCountdownComplete = () => {
     setShowCountdown(false);
-    if (leftChoice === "YES" && rightChoice === "YES") {
+    // Sender always said YES by creating
+    if (rightChoice === "YES") {
       setOutcome("match");
       sound.playCelebration();
-    } else if (leftChoice === "NO" && rightChoice === "NO") {
-      setOutcome("no-match");
-      sound.playWahWah();
     } else {
       setOutcome("mismatch");
       sound.playWahWah();
@@ -85,8 +85,7 @@ const Index = () => {
     };
   }, [outcome]);
 
-  const reset = () => {
-    setLeftChoice(null);
+  const resetGame = () => {
     setRightChoice(null);
     setOutcome(null);
     setShowOutcome(false);
@@ -94,35 +93,35 @@ const Index = () => {
     setNoDodgeCount(0);
     setShakeRight(false);
     setShowCountdown(false);
-    setShowIntro(false);
-    setIntroComplete(true); // skip intro on replay
-  };
-
-  const backToSelect = () => {
-    reset();
-    setCharacter(null);
-    setIntroComplete(false);
+    setPhase("share");
   };
 
   const backToNames = () => {
-    reset();
+    resetGame();
     setCharacter(null);
-    setIntroComplete(false);
     setYourName("");
     setTheirName("");
     setLoveNote("");
+    setPhase("names");
   };
 
-  if (!yourName || !theirName) {
+  const backToSelect = () => {
+    resetGame();
+    setCharacter(null);
+    setPhase("character");
+  };
+
+  // Phase routing
+  if (phase === "names" || (!yourName || !theirName)) {
     return (
       <>
         <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
-        <NameEntry onSubmit={(y, t, note) => { setYourName(y); setTheirName(t); setLoveNote(note); sound.playBloop(); }} />
+        <NameEntry onSubmit={(y, t, note) => { setYourName(y); setTheirName(t); setLoveNote(note); setPhase("character"); sound.playBloop(); }} />
       </>
     );
   }
 
-  if (!character) {
+  if (phase === "character" || !character) {
     return (
       <>
         <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
@@ -131,7 +130,23 @@ const Index = () => {
     );
   }
 
-  if (showIntro) {
+  if (phase === "share") {
+    return (
+      <>
+        <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
+        <ShareScreen
+          yourName={yourName}
+          theirName={theirName}
+          character={character}
+          loveNote={loveNote}
+          onSendAnother={backToNames}
+          onPreviewAsReceiver={handlePreviewAsReceiver}
+        />
+      </>
+    );
+  }
+
+  if (phase === "intro") {
     return (
       <>
         <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
@@ -140,11 +155,9 @@ const Index = () => {
     );
   }
 
-  const bothChosen = leftChoice !== null && rightChoice !== null;
-  const leftSaidYes = leftChoice === "YES";
-
+  // Game board phase
+  const bothChosen = rightChoice !== null;
   const CharacterComponent = character === "alpaca" ? PixelAlpaca : character === "dino" ? PixelDino : PixelPanda;
-
   const approachDist = character === "alpaca" ? 55 : character === "dino" ? 48 : 55;
   const celebrating = matchPhase === "celebrating";
 
@@ -167,17 +180,13 @@ const Index = () => {
       </motion.h1>
 
       <div className="flex flex-col sm:flex-row items-center sm:items-end gap-8 sm:gap-12 md:gap-20">
-        {/* Left side - Green character */}
+        {/* Left side - Sender (Green) — no buttons, already said YES */}
         <motion.div
           className="flex flex-col items-center gap-4"
           animate={
             showOutcome
               ? outcome === "match"
                 ? { x: matchPhase === "approaching" ? approachDist : matchPhase === "pecking" ? approachDist + 8 : approachDist - 5 }
-                : outcome === "no-match"
-                ? { x: -300, opacity: 0 }
-                : leftSaidYes
-                ? {}
                 : { x: -300, opacity: 0 }
               : {}
           }
@@ -187,18 +196,12 @@ const Index = () => {
             animate={celebrating ? { y: [0, -15, 0] } : {}}
             transition={celebrating ? { repeat: Infinity, duration: 0.5 } : {}}
           >
-            <CharacterComponent
-              color="green"
-              confused={outcome === "mismatch" && leftSaidYes}
-            />
+            <CharacterComponent color="green" />
           </motion.div>
           {!showOutcome && (
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-1">
               <span className="text-xl text-foreground tracking-wide">{yourName}</span>
-              <div className="flex gap-3">
-                <ChoiceButton label="NO" color="green" selected={leftChoice === "NO"} onClick={() => { setLeftChoice("NO"); sound.playBloop(); }} disabled={bothChosen} />
-                <ChoiceButton label="YES" color="green" selected={leftChoice === "YES"} onClick={() => { setLeftChoice("YES"); sound.playDing(); }} disabled={bothChosen} />
-              </div>
+              <span className="text-sm text-muted-foreground">asked you to be their valentine 💚</span>
             </div>
           )}
         </motion.div>
@@ -218,18 +221,16 @@ const Index = () => {
           )}
         </AnimatePresence>
 
-        {/* Right side - Pink character */}
+        {/* Right side - Receiver (Pink) — has YES/NO buttons */}
         <motion.div
           className="flex flex-col items-center gap-4"
           animate={
             showOutcome
               ? outcome === "match"
                 ? { x: matchPhase === "approaching" ? -approachDist : matchPhase === "pecking" ? -(approachDist + 8) : -(approachDist - 5) }
-                : outcome === "no-match"
+                : rightChoice === "NO"
                 ? { x: 300, opacity: 0 }
-                : !leftSaidYes
-                ? {}
-                : { x: 300, opacity: 0 }
+                : {}
               : {}
           }
           transition={{ duration: 0.8, ease: "easeInOut" }}
@@ -254,7 +255,7 @@ const Index = () => {
             <CharacterComponent
               color="pink"
               mirror
-              confused={outcome === "mismatch" && !leftSaidYes}
+              confused={outcome === "mismatch"}
             />
           </motion.div>
           {!showOutcome && (
@@ -305,7 +306,7 @@ const Index = () => {
               yourName={yourName}
               theirName={theirName}
               character={character}
-              onPlayAgain={reset}
+              onPlayAgain={resetGame}
               onSwitchCharacters={backToSelect}
             />
           ) : (
@@ -316,16 +317,15 @@ const Index = () => {
               transition={{ delay: 0.5 }}
             >
               <p className="text-3xl sm:text-4xl text-foreground text-center">
-                {outcome === "no-match" && "Maybe next time... 💔"}
-                {outcome === "mismatch" && "Awkward... 😅"}
+                Awkward... 😅
               </p>
               <div className="flex gap-4">
                 <button
-                  onClick={reset}
+                  onClick={resetGame}
                   className="px-8 py-3 text-xl rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95"
                   style={{ borderColor: "hsl(var(--primary))" }}
                 >
-                  Play Again 🔄
+                  Try Again 🔄
                 </button>
                 <button
                   onClick={backToSelect}
