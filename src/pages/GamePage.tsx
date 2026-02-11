@@ -152,8 +152,8 @@ const GamePage = () => {
           transition={{ duration: 0.8, ease: "easeInOut" }}
         >
           <motion.div
-            animate={celebrating ? { y: [0, -15, 0] } : {}}
-            transition={celebrating ? { repeat: Infinity, duration: 0.5 } : {}}
+            animate={celebrating ? { y: [0, -15, 0] } : { y: [0, -6, 0] }}
+            transition={celebrating ? { repeat: Infinity, duration: 0.5 } : { repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
           >
             <CharacterComponent color="green" />
           </motion.div>
@@ -221,19 +221,25 @@ const GamePage = () => {
                   animate={{
                     scale: noDodgeCount >= 5 ? 2 : noDodgeCount >= 4 ? 1.5 : noDodgeCount >= 3 ? 1.2 : 1,
                     boxShadow: noDodgeCount >= 4
-                      ? "0 0 20px hsl(var(--alpaca-pink)), 0 0 40px hsl(var(--alpaca-pink))"
+                      ? "0 0 20px #4ADE80, 0 0 40px #4ADE80"
                       : "none",
                   }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   style={{ borderRadius: "0.375rem" }}
                 >
-                  <ChoiceButton
-                    label="YES"
-                    color="pink"
-                    selected={rightChoice === "YES"}
+                  <button
                     onClick={() => { setRightChoice("YES"); sound.playDing(); }}
                     disabled={bothChosen}
-                  />
+                    className="px-7 py-3 text-xl font-hand rounded-md border-[3px] transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
+                    style={{
+                      borderColor: "#4ADE80",
+                      backgroundColor: rightChoice === "YES" ? "#4ADE80" : "transparent",
+                      color: rightChoice === "YES" ? "hsl(var(--background))" : "hsl(var(--foreground))",
+                      fontFamily: "'Patrick Hand', cursive",
+                    }}
+                  >
+                    YES 💚
+                  </button>
                 </motion.div>
                 <DodgeNoButton
                   color="pink"
@@ -245,6 +251,12 @@ const GamePage = () => {
                     setNoDodgeCount((c) => c + 1);
                     setShakeRight(true);
                     sound.playDodge();
+                  }}
+                  customStyle={{
+                    borderColor: "#6B7280",
+                    fontSize: "0.9rem",
+                    padding: "0.35rem 0.75rem",
+                    opacity: 0.7,
                   }}
                 />
               </div>
