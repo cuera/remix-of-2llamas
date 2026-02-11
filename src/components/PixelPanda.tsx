@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 
-// Panda pixel grid: 0=transparent, 1=body(white), 2=dark(black patches), 3=eye
 const PANDA_GRID = [
   [0,0,0,2,2,0,0,0,0,2,2,0],
   [0,0,2,2,2,0,0,0,2,2,2,0],
@@ -45,7 +44,6 @@ interface PixelPandaProps {
 
 const PixelPanda = ({ color, mirror = false, className = "", confused = false }: PixelPandaProps) => {
   const colors = COLOR_MAP[color];
-  const pixelSize = 12;
 
   const grid = mirror
     ? PANDA_GRID.map(row => [...row].reverse())
@@ -53,7 +51,6 @@ const PixelPanda = ({ color, mirror = false, className = "", confused = false }:
 
   const getCellColor = (cell: number, r: number, c: number) => {
     if (cell === 0) return "transparent";
-    // Eye positions
     const eyeL = mirror ? PANDA_GRID[0].length - 1 - EYE_POS_LEFT.col : EYE_POS_LEFT.col;
     const eyeR = mirror ? PANDA_GRID[0].length - 1 - EYE_POS_RIGHT.col : EYE_POS_RIGHT.col;
     if (r === EYE_POS_LEFT.row && (c === eyeL || c === eyeR)) return "hsl(var(--background))";
@@ -67,8 +64,8 @@ const PixelPanda = ({ color, mirror = false, className = "", confused = false }:
       <div
         className="grid"
         style={{
-          gridTemplateColumns: `repeat(${grid[0].length}, ${pixelSize}px)`,
-          gridTemplateRows: `repeat(${grid.length}, ${pixelSize}px)`,
+          gridTemplateColumns: `repeat(${grid[0].length}, var(--pixel-size))`,
+          gridTemplateRows: `repeat(${grid.length}, var(--pixel-size))`,
         }}
       >
         {grid.map((row, r) =>
@@ -76,8 +73,8 @@ const PixelPanda = ({ color, mirror = false, className = "", confused = false }:
             <div
               key={`${r}-${c}`}
               style={{
-                width: `${pixelSize}px`,
-                height: `${pixelSize}px`,
+                width: "var(--pixel-size)",
+                height: "var(--pixel-size)",
                 backgroundColor: getCellColor(cell, r, c),
                 boxShadow: cell ? `inset -1px -1px 0 ${colors.shadow}` : "none",
               }}

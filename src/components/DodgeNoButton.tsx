@@ -27,10 +27,8 @@ const DodgeNoButton = ({ color, selected, onClick, disabled, dodgeCount, onDodge
 
   const label = DODGE_LABELS[Math.min(dodgeCount, DODGE_LABELS.length - 1)];
 
-  // Progressive shrinking
   const scale = dodgeCount >= 5 ? 0.3 : dodgeCount >= 4 ? 0.5 : dodgeCount >= 3 ? 0.7 : 1;
   const opacity = dodgeCount >= 5 ? 0.3 : dodgeCount >= 4 ? 0.5 : 1;
-  // Slide right 40px per attempt
   const xOffset = dodgeCount * 40;
 
   const handleInteraction = () => {
@@ -51,7 +49,7 @@ const DodgeNoButton = ({ color, selected, onClick, disabled, dodgeCount, onDodge
         }
       }}
       disabled={disabled}
-      className="px-5 py-2 text-lg font-hand rounded-md border-[3px] transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+      className="px-5 py-2 text-lg font-hand rounded-md border-[3px] transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap min-h-[48px]"
       style={{
         borderColor,
         backgroundColor: bgColor,
@@ -66,7 +64,7 @@ const DodgeNoButton = ({ color, selected, onClick, disabled, dodgeCount, onDodge
         scale,
         opacity,
       }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      transition={{ type: "spring", damping: 15, stiffness: 120 }}
       whileTap={{ scale: scale * 0.9 }}
     >
       {label}

@@ -29,7 +29,7 @@ const NameEntry = ({ onSubmit }: NameEntryProps) => {
         className="text-4xl sm:text-5xl md:text-6xl text-foreground mb-10 text-center"
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 200, damping: 15 }}
+        transition={{ type: "spring", damping: 15, stiffness: 120 }}
       >
         BE MY VALENTINE? 💕
       </motion.h1>
@@ -50,7 +50,7 @@ const NameEntry = ({ onSubmit }: NameEntryProps) => {
             value={yourName}
             onChange={(e) => setYourName(e.target.value.slice(0, 30))}
             required
-            className="w-full px-4 py-3 text-xl rounded-lg border-[3px] border-border bg-card/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+            className="w-full px-4 py-3 text-xl rounded-lg border-[3px] border-border bg-card/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors min-h-[48px]"
           />
         </div>
 
@@ -63,7 +63,7 @@ const NameEntry = ({ onSubmit }: NameEntryProps) => {
             value={theirName}
             onChange={(e) => setTheirName(e.target.value.slice(0, 30))}
             required
-            className="w-full px-4 py-3 text-xl rounded-lg border-[3px] border-border bg-card/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+            className="w-full px-4 py-3 text-xl rounded-lg border-[3px] border-border bg-card/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors min-h-[48px]"
           />
         </div>
 
@@ -72,8 +72,7 @@ const NameEntry = ({ onSubmit }: NameEntryProps) => {
           <button
             type="button"
             onClick={() => setNoteOpen(!noteOpen)}
-            className="text-base transition-colors hover:opacity-80"
-            style={{ color: "#9B8BB4" }}
+            className="text-base transition-colors hover:opacity-80 text-muted-foreground min-h-[48px]"
           >
             Add a love note (optional) {noteOpen ? "▴" : "▾"}
           </button>
@@ -95,7 +94,7 @@ const NameEntry = ({ onSubmit }: NameEntryProps) => {
                     rows={3}
                     className="w-full px-4 py-3 text-xl rounded-lg border-[3px] border-border bg-card/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors resize-none"
                   />
-                  <span className="text-sm self-end" style={{ color: "#9B8BB4" }}>
+                  <span className="text-sm self-end text-muted-foreground">
                     {loveNote.length}/100
                   </span>
                 </div>
@@ -107,7 +106,7 @@ const NameEntry = ({ onSubmit }: NameEntryProps) => {
         <motion.button
           type="submit"
           disabled={!isValid}
-          className="px-10 py-3 text-2xl rounded-lg border-[3px] border-primary text-foreground transition-all hover:scale-105 active:scale-95 mt-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+          className="px-10 py-3 text-2xl rounded-lg border-[3px] border-primary text-foreground transition-all hover:scale-105 active:scale-95 mt-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 min-h-[48px]"
           whileHover={isValid ? { scale: 1.05 } : {}}
           whileTap={isValid ? { scale: 0.95 } : {}}
         >
@@ -119,7 +118,7 @@ const NameEntry = ({ onSubmit }: NameEntryProps) => {
         {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute text-2xl opacity-20"
+            className={`absolute text-2xl opacity-20 ${i >= 4 ? "hidden sm:block" : ""}`}
             style={{ left: `${15 + i * 15}%`, top: `${20 + (i % 3) * 25}%` }}
             animate={{ y: [0, -20, 0], rotate: [0, 10, -10, 0] }}
             transition={{ repeat: Infinity, duration: 3 + i * 0.5, delay: i * 0.7, ease: "easeInOut" }}

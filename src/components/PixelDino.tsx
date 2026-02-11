@@ -1,7 +1,5 @@
 import { motion } from "framer-motion";
 
-// Parsed from box-shadow pixel art - a long-necked dino/brontosaurus
-// 0=transparent, 1=main, 2=accent, 3=eye, 4=shade1, 5=shade2
 const DINO_GRID = [
   [0,0,0,0,0,0,0,2,0,2,0,0,0,0,0],
   [0,0,0,0,0,0,0,2,0,2,1,1,1,1,0],
@@ -32,7 +30,6 @@ const DINO_GRID = [
   [0,0,1,5,0,0,0,0,0,1,2,0,0,0,0],
 ];
 
-// Eye position for the right-facing version
 const EYE_POS = { row: 2, col: 12 };
 
 const COLOR_MAP = {
@@ -61,7 +58,6 @@ interface PixelDinoProps {
 
 const PixelDino = ({ color, mirror = false, className = "", confused = false }: PixelDinoProps) => {
   const colors = COLOR_MAP[color];
-  const pixelSize = 8; // smaller than alpaca since dino is taller
 
   const grid = mirror
     ? DINO_GRID.map(row => [...row].reverse())
@@ -87,8 +83,8 @@ const PixelDino = ({ color, mirror = false, className = "", confused = false }: 
       <div
         className="grid"
         style={{
-          gridTemplateColumns: `repeat(${grid[0].length}, ${pixelSize}px)`,
-          gridTemplateRows: `repeat(${grid.length}, ${pixelSize}px)`,
+          gridTemplateColumns: `repeat(${grid[0].length}, var(--pixel-size))`,
+          gridTemplateRows: `repeat(${grid.length}, var(--pixel-size))`,
         }}
       >
         {grid.map((row, r) =>
@@ -96,8 +92,8 @@ const PixelDino = ({ color, mirror = false, className = "", confused = false }: 
             <div
               key={`${r}-${c}`}
               style={{
-                width: `${pixelSize}px`,
-                height: `${pixelSize}px`,
+                width: "var(--pixel-size)",
+                height: "var(--pixel-size)",
                 backgroundColor: getCellColor(cell, r, c),
                 boxShadow: cell ? `inset -1px -1px 0 ${colors.dark}` : "none",
               }}

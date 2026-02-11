@@ -4,50 +4,65 @@
 
 @layer base {
   :root {
-    --background: 276 45% 20%;
-    --foreground: 330 100% 95%;
+    --background: 270 40% 17%;
+    --foreground: 270 40% 92%;
 
-    --card: 276 40% 25%;
-    --card-foreground: 330 100% 95%;
+    --card: 240 33% 14%;
+    --card-foreground: 270 40% 92%;
 
-    --popover: 276 40% 25%;
-    --popover-foreground: 330 100% 95%;
+    --popover: 240 33% 14%;
+    --popover-foreground: 270 40% 92%;
 
-    --primary: 330 80% 65%;
-    --primary-foreground: 276 45% 15%;
+    --primary: 330 80% 51%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 276 30% 30%;
-    --secondary-foreground: 330 100% 95%;
+    --secondary: 270 30% 30%;
+    --secondary-foreground: 270 40% 92%;
 
-    --muted: 276 30% 28%;
-    --muted-foreground: 330 30% 70%;
+    --muted: 270 20% 25%;
+    --muted-foreground: 270 20% 63%;
 
-    --accent: 140 60% 50%;
-    --accent-foreground: 276 45% 15%;
+    --accent: 140 60% 55%;
+    --accent-foreground: 270 40% 12%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 276 30% 35%;
-    --input: 276 30% 35%;
-    --ring: 330 80% 65%;
+    --border: 270 30% 37%;
+    --input: 270 30% 37%;
+    --ring: 330 80% 51%;
 
     --radius: 0.75rem;
 
-    --alpaca-green: 140 60% 50%;
-    --alpaca-pink: 330 80% 65%;
+    --alpaca-green: 140 60% 55%;
+    --alpaca-pink: 330 80% 51%;
+    --soft-pink: 330 80% 80%;
     --pixel-size: 12px;
 
-    --sidebar-background: 276 45% 20%;
-    --sidebar-foreground: 330 100% 95%;
-    --sidebar-primary: 330 80% 65%;
-    --sidebar-primary-foreground: 276 45% 15%;
-    --sidebar-accent: 276 30% 30%;
-    --sidebar-accent-foreground: 330 100% 95%;
-    --sidebar-border: 276 30% 35%;
-    --sidebar-ring: 330 80% 65%;
+    --sidebar-background: 270 40% 17%;
+    --sidebar-foreground: 270 40% 92%;
+    --sidebar-primary: 330 80% 51%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 270 30% 30%;
+    --sidebar-accent-foreground: 270 40% 92%;
+    --sidebar-border: 270 30% 37%;
+    --sidebar-ring: 330 80% 51%;
 
     font-family: 'Patrick Hand', cursive;
+  }
+
+  @media (max-width: 640px) {
+    :root {
+      --pixel-size: 8px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 

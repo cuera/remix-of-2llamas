@@ -1,7 +1,5 @@
 import { motion } from "framer-motion";
 
-// Alpaca pixel grid: 1 = filled, 0 = transparent
-// Facing RIGHT (green alpaca). Pink alpaca will mirror this.
 const ALPACA_GRID = [
   [0,0,0,0,0,0,0,0,1,1,0,0],
   [0,0,0,0,0,0,0,1,1,1,1,0],
@@ -19,7 +17,6 @@ const ALPACA_GRID = [
   [0,0,1,1,0,0,0,0,1,1,0,0],
 ];
 
-// Eye position (row, col) for the right-facing version
 const EYE_POS = { row: 2, col: 9 };
 
 interface PixelAlpacaProps {
@@ -31,7 +28,7 @@ interface PixelAlpacaProps {
 
 const PixelAlpaca = ({ color, mirror = false, className = "", confused = false }: PixelAlpacaProps) => {
   const fillColor = color === "green" ? "hsl(var(--alpaca-green))" : "hsl(var(--alpaca-pink))";
-  const darkColor = color === "green" ? "hsl(140 60% 35%)" : "hsl(330 80% 50%)";
+  const darkColor = color === "green" ? "hsl(140 60% 35%)" : "hsl(330 80% 40%)";
 
   const grid = mirror
     ? ALPACA_GRID.map(row => [...row].reverse())
@@ -40,15 +37,12 @@ const PixelAlpaca = ({ color, mirror = false, className = "", confused = false }
   const eyeCol = mirror ? ALPACA_GRID[0].length - 1 - EYE_POS.col : EYE_POS.col;
 
   return (
-    <motion.div
-      className={`inline-block ${className}`}
-      style={{ transform: mirror ? undefined : undefined }}
-    >
+    <motion.div className={`inline-block ${className}`}>
       <div
         className="grid"
         style={{
-          gridTemplateColumns: `repeat(${grid[0].length}, var(--pixel-size, 12px))`,
-          gridTemplateRows: `repeat(${grid.length}, var(--pixel-size, 12px))`,
+          gridTemplateColumns: `repeat(${grid[0].length}, var(--pixel-size))`,
+          gridTemplateRows: `repeat(${grid.length}, var(--pixel-size))`,
         }}
       >
         {grid.map((row, r) =>
@@ -58,8 +52,8 @@ const PixelAlpaca = ({ color, mirror = false, className = "", confused = false }
               <div
                 key={`${r}-${c}`}
                 style={{
-                  width: "var(--pixel-size, 12px)",
-                  height: "var(--pixel-size, 12px)",
+                  width: "var(--pixel-size)",
+                  height: "var(--pixel-size)",
                   backgroundColor: cell
                     ? isEye
                       ? "hsl(var(--background))"
