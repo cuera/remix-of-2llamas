@@ -149,7 +149,7 @@ const MatchCertificate = ({
           className="mt-3 text-xs tracking-wider"
           style={{ color: "hsl(270, 15%, 62%)", letterSpacing: "0.1em" }}
         >
-          valentine-alpaca.lovable.app
+          {window.location.host}
         </p>
 
         <span className="absolute top-3 left-3 text-sm opacity-30">💕</span>
