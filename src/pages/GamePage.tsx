@@ -355,7 +355,7 @@ const GamePage = () => {
                 yourName={yourName}
                 theirName={theirName}
                 character={character}
-                onSwitchCharacters={() => navigate("/create", { replace: true })}
+                onSendBack={() => navigate(`/create?from=${encodeURIComponent(theirName)}&to=${encodeURIComponent(yourName)}`, { replace: true })}
               />
             ) : (
               <motion.div
@@ -395,18 +395,18 @@ const GamePage = () => {
                   transition={{ delay: 2.5 }}
                 >
                   <button
-                    onClick={() => navigate("/create", { replace: true })}
+                    onClick={() => navigate(`/create?from=${encodeURIComponent(theirName)}&to=${encodeURIComponent(yourName)}`, { replace: true })}
                     className="px-7 py-3 text-lg rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95 min-h-[48px]"
                     style={{ borderColor: "hsl(var(--primary))" }}
                   >
-                    💌 Send Your Own Valentine
+                    💌 Send {yourName} a Valentine Instead
                   </button>
                   <button
-                    onClick={() => navigate("/", { replace: true })}
+                    onClick={() => navigate("/create", { replace: true })}
                     className="px-7 py-3 text-lg rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95 min-h-[48px]"
                     style={{ borderColor: "hsl(var(--muted-foreground))" }}
                   >
-                    🔀 Try Again
+                    💌 Send Your Own Valentine
                   </button>
                 </motion.div>
               </motion.div>
@@ -449,7 +449,7 @@ const GamePage = () => {
                 yourName={yourName}
                 theirName={theirName}
                 character={character}
-                onSwitchCharacters={() => navigate("/create", { replace: true })}
+                onSendBack={() => navigate(`/create?from=${encodeURIComponent(theirName)}&to=${encodeURIComponent(yourName)}`, { replace: true })}
               />
             </>
           ) : (
@@ -463,10 +463,10 @@ const GamePage = () => {
               </motion.p>
               <motion.div className="text-4xl">💔</motion.div>
               <button
-                onClick={() => navigate("/create")}
+                onClick={() => navigate(`/create?from=${encodeURIComponent(theirName)}&to=${encodeURIComponent(yourName)}`)}
                 className="px-6 py-3 rounded-lg border-2 border-primary text-foreground hover:scale-105 active:scale-95 transition-all min-h-[48px]"
               >
-                💌 Send Your Own Valentine
+                💌 Send {yourName} a Valentine
               </button>
             </motion.div>
           )}
@@ -529,7 +529,7 @@ const GamePage = () => {
                 yourName={yourName}
                 theirName={theirName}
                 character={character}
-                onSwitchCharacters={() => navigate("/create")}
+                onSendBack={() => navigate("/create")}
               />
             </motion.div>
           )}

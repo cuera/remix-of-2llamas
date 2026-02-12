@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import NameEntry from "@/components/NameEntry";
 import CharacterSelect, { type CharacterType } from "@/components/CharacterSelect";
@@ -13,8 +13,11 @@ type CreatePhase = "names" | "character";
 
 const CreatePage = () => {
   const navigate = useNavigate();
-  const [yourName, setYourName] = useState("");
-  const [theirName, setTheirName] = useState("");
+  const [searchParams] = useSearchParams();
+  const prefillFrom = searchParams.get("from") || "";
+  const prefillTo = searchParams.get("to") || "";
+  const [yourName, setYourName] = useState(prefillFrom);
+  const [theirName, setTheirName] = useState(prefillTo);
   const [loveNote, setLoveNote] = useState("");
   const [phase, setPhase] = useState<CreatePhase>("names");
   const sound = useSoundEffects();
@@ -59,7 +62,7 @@ const CreatePage = () => {
         to={phase === "names" ? "/" : undefined}
       />
       {phase === "names" ? (
-        <NameEntry onSubmit={handleNamesSubmit} />
+        <NameEntry onSubmit={handleNamesSubmit} initialYourName={prefillFrom} initialTheirName={prefillTo} />
       ) : (
         <CharacterSelect onSelect={handleCharacterSelect} isLoading={isLoading} />
       )}

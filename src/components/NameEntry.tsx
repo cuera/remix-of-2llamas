@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface NameEntryProps {
   onSubmit: (yourName: string, theirName: string, loveNote: string) => void;
+  initialYourName?: string;
+  initialTheirName?: string;
 }
 
-const NameEntry = ({ onSubmit }: NameEntryProps) => {
-  const [yourName, setYourName] = useState("");
-  const [theirName, setTheirName] = useState("");
+const NameEntry = ({ onSubmit, initialYourName = "", initialTheirName = "" }: NameEntryProps) => {
+  const [yourName, setYourName] = useState(initialYourName);
+  const [theirName, setTheirName] = useState(initialTheirName);
   const [loveNote, setLoveNote] = useState("");
   const [noteOpen, setNoteOpen] = useState(false);
 

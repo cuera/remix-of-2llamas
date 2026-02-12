@@ -1,5 +1,4 @@
 import { useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toPng } from "html-to-image";
 import PixelAlpaca from "./PixelAlpaca";
@@ -11,7 +10,7 @@ interface MatchCertificateProps {
   yourName: string;
   theirName: string;
   character: CharacterType;
-  onSwitchCharacters: () => void;
+  onSendBack: () => void;
 }
 
 const SPRING = { type: "spring" as const, damping: 15, stiffness: 120 };
@@ -20,10 +19,9 @@ const MatchCertificate = ({
   yourName,
   theirName,
   character,
-  onSwitchCharacters,
+  onSendBack,
 }: MatchCertificateProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
 
   const CharacterComponent =
     character === "alpaca"
@@ -47,6 +45,36 @@ const MatchCertificate = ({
       console.error("Screenshot failed:", err);
     }
   }, [yourName, theirName]);
+
+  const handleShareResult = useCallback(async () => {
+    if (!cardRef.current) return;
+    try {
+      const dataUrl = await toPng(cardRef.current, {
+        pixelRatio: 2,
+        backgroundColor: "hsl(270, 40%, 17%)",
+      });
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+      const file = new File([blob], `valentine-${yourName}-${theirName}.png`, { type: "image/png" });
+
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({
+          text: `${yourName} & ${theirName} are Valentines! 💕 Send yours: ${window.location.origin}`,
+          files: [file],
+        });
+      } else {
+        // Fallback: WhatsApp text-only share
+        const text = encodeURIComponent(
+          `${yourName} & ${theirName} are Valentines! 💕 Send yours: ${window.location.origin}`
+        );
+        window.open(`https://wa.me/?text=${text}`, "_blank");
+      }
+    } catch (err) {
+      if ((err as Error).name !== "AbortError") {
+        handleDownload();
+      }
+    }
+  }, [yourName, theirName, handleDownload]);
 
   const buttonBase =
     "px-7 py-3 text-lg rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95 min-h-[48px]";
@@ -146,8 +174,8 @@ const MatchCertificate = ({
         </p>
 
         <p
-          className="mt-3 text-xs tracking-wider"
-          style={{ color: "hsl(270, 15%, 62%)", letterSpacing: "0.1em" }}
+          className="mt-3 text-sm tracking-wider font-bold"
+          style={{ color: "hsl(270, 30%, 45%)", letterSpacing: "0.12em" }}
         >
           {window.location.host}
         </p>
@@ -158,23 +186,23 @@ const MatchCertificate = ({
         <span className="absolute bottom-3 right-3 text-sm opacity-30">💕</span>
       </div>
 
-      {/* Staggered buttons */}
+      {/* Staggered buttons — ordered by viral impact */}
       <div className="flex flex-col items-center gap-3 mt-2">
         <motion.button
-          onClick={handleDownload}
+          onClick={handleShareResult}
           className={buttonBase}
-          style={{ borderColor: "hsl(var(--primary))" }}
+          style={{ borderColor: "hsl(var(--alpaca-pink))", backgroundColor: "hsl(var(--alpaca-pink))", color: "white" }}
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.8 }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          📸 Download Card
+          📤 Share Our Match!
         </motion.button>
 
         <motion.button
-          onClick={() => navigate("/create", { replace: true })}
+          onClick={onSendBack}
           className={buttonBase}
           style={{ borderColor: "hsl(var(--alpaca-green))" }}
           initial={{ opacity: 0, y: 15 }}
@@ -183,11 +211,11 @@ const MatchCertificate = ({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          💌 Send Your Own Valentine
+          💌 Send One Back to {yourName}!
         </motion.button>
 
         <motion.button
-          onClick={onSwitchCharacters}
+          onClick={handleDownload}
           className={buttonBase}
           style={{ borderColor: "hsl(var(--muted-foreground))" }}
           initial={{ opacity: 0, y: 15 }}
@@ -196,7 +224,7 @@ const MatchCertificate = ({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          🔀 Switch Characters
+          📸 Download Card
         </motion.button>
       </div>
     </motion.div>

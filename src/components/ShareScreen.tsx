@@ -48,7 +48,7 @@ const ShareScreen = ({
 
   const handleWhatsApp = () => {
     const text = encodeURIComponent(
-      `Hey ${theirName}! Someone has a Valentine question for you 💕 ${shareUrl}`
+      `Hey ${theirName}! 💌 Someone has a Valentine's Day question for you... will you open it? 👉 ${shareUrl}`
     );
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };
