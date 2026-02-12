@@ -8,6 +8,7 @@ export type CharacterType = "alpaca" | "dino" | "panda";
 
 interface CharacterSelectProps {
   onSelect: (type: CharacterType) => void;
+  isLoading?: boolean;
 }
 
 const characters: { type: CharacterType; label: string; emoji: string }[] = [
@@ -18,7 +19,7 @@ const characters: { type: CharacterType; label: string; emoji: string }[] = [
 
 const SPRING = { type: "spring" as const, damping: 15, stiffness: 120 };
 
-const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
+const CharacterSelect = ({ onSelect, isLoading = false }: CharacterSelectProps) => {
   const [selected, setSelected] = useState<CharacterType | null>(null);
 
   return (
@@ -85,12 +86,12 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.7 }}
-        whileHover={selected ? { scale: 1.05 } : {}}
-        whileTap={selected ? { scale: 0.95 } : {}}
-        disabled={!selected}
-        onClick={() => selected && onSelect(selected)}
+        whileHover={selected && !isLoading ? { scale: 1.05 } : {}}
+        whileTap={selected && !isLoading ? { scale: 0.95 } : {}}
+        disabled={!selected || isLoading}
+        onClick={() => selected && !isLoading && onSelect(selected)}
       >
-        Create & Share 💝
+        {isLoading ? 'Creating... 💌' : 'Create & Share 💝'}
       </motion.button>
     </div>
   );

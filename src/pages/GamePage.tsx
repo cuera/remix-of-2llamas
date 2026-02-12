@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import PixelAlpaca from "@/components/PixelAlpaca";
 import PixelDino from "@/components/PixelDino";
@@ -12,6 +12,8 @@ import IntroSequence from "@/components/IntroSequence";
 import SoundToggle from "@/components/SoundToggle";
 import PageTransition from "@/components/PageTransition";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
+import { useValentine } from "@/hooks/useValentine";
+import { useSubmitChoice } from "@/hooks/useSubmitChoice";
 import type { CharacterType } from "@/components/CharacterSelect";
 
 type Choice = null | "YES" | "NO";
@@ -36,12 +38,15 @@ const DEFAULT_STATE: GameState = {
 const SPRING = { type: "spring" as const, damping: 15, stiffness: 120 };
 
 const GamePage = () => {
-  const location = useLocation();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const passedState = location.state as GameState | null;
-  const state = passedState || DEFAULT_STATE;
   const sound = useSoundEffects();
 
+  // Load valentine from database
+  const { valentine, role, isLoading, error } = useValentine(id!);
+  const { submitChoice, isSubmitting } = useSubmitChoice(id!);
+
+  // Game state for receiver view (must be declared unconditionally)
   const [phase, setPhase] = useState<GamePhase>("intro");
   const [rightChoice, setRightChoice] = useState<Choice>(null);
   const [outcome, setOutcome] = useState<Outcome>(null);
@@ -51,6 +56,7 @@ const GamePage = () => {
   const [shakeRight, setShakeRight] = useState(false);
   const [showCountdown, setShowCountdown] = useState(false);
 
+  // Callbacks and effects for receiver game
   const handleIntroComplete = useCallback(() => {
     setPhase("game");
     sound.playBloop();
@@ -89,9 +95,52 @@ const GamePage = () => {
     };
   }, [outcome]);
 
-  const { yourName, theirName, character, loveNote } = state;
+  // Loading state
+  if (isLoading) {
+    return (
+      <PageTransition>
+        <div className="min-h-screen flex items-center justify-center">
+          <motion.div
+            className="text-4xl"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ repeat: Infinity, duration: 1 }}
+          >
+            💕
+          </motion.div>
+        </div>
+      </PageTransition>
+    );
+  }
 
-  if (phase === "intro") {
+  // Error state
+  if (error || !valentine) {
+    return (
+      <PageTransition>
+        <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+          <span className="text-4xl">💔</span>
+          <h1 className="text-3xl text-foreground">Valentine not found</h1>
+          <button
+            onClick={() => navigate('/')}
+            className="px-6 py-3 rounded-lg border-2 border-border text-foreground hover:scale-105 active:scale-95 transition-all min-h-[48px]"
+          >
+            Go Home
+          </button>
+        </div>
+      </PageTransition>
+    );
+  }
+
+  // Extract valentine data and map character type back to singular
+  const yourName = valentine.sender_name;
+  const theirName = valentine.receiver_name;
+  const character = valentine.character_type.replace(/s$/, '') as CharacterType;
+  const loveNote = valentine.love_note || '';
+
+  // ROLE-BASED RENDERING
+
+  // RECEIVER VIEW - Show game if receiver hasn't chosen yet
+  if (role === 'receiver' && !valentine.receiver_choice) {
+    if (phase === "intro") {
     return (
       <PageTransition>
         <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
@@ -238,8 +287,12 @@ const GamePage = () => {
                     style={{ borderRadius: "0.375rem" }}
                   >
                     <button
-                      onClick={() => { setRightChoice("YES"); sound.playDing(); }}
-                      disabled={bothChosen}
+                      onClick={async () => {
+                        setRightChoice("YES");
+                        sound.playDing();
+                        await submitChoice('YES');
+                      }}
+                      disabled={bothChosen || isSubmitting}
                       className="px-7 py-3 text-xl font-hand rounded-md border-[3px] transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 min-h-[48px]"
                       style={{
                         borderColor: "hsl(var(--alpaca-green))",
@@ -254,8 +307,12 @@ const GamePage = () => {
                   <DodgeNoButton
                     color="pink"
                     selected={rightChoice === "NO"}
-                    onClick={() => { setRightChoice("NO"); sound.playBloop(); }}
-                    disabled={bothChosen}
+                    onClick={async () => {
+                      setRightChoice("NO");
+                      sound.playBloop();
+                      await submitChoice('NO');
+                    }}
+                    disabled={bothChosen || isSubmitting}
                     dodgeCount={noDodgeCount}
                     onDodge={() => {
                       setNoDodgeCount((c) => c + 1);
@@ -374,6 +431,197 @@ const GamePage = () => {
       </div>
     </PageTransition>
   );
+  }
+
+  // RECEIVER VIEW - Already chose, show outcome
+  if (role === 'receiver' && valentine.receiver_choice) {
+    const CharacterComponent = character === "alpaca" ? PixelAlpaca : character === "dino" ? PixelDino : PixelPanda;
+    const didMatch = valentine.receiver_choice === 'YES';
+
+    return (
+      <PageTransition>
+        <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
+        <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+          {didMatch ? (
+            <>
+              <ConfettiHearts />
+              <MatchCertificate
+                yourName={yourName}
+                theirName={theirName}
+                character={character}
+                onSwitchCharacters={() => navigate("/create", { replace: true })}
+              />
+            </>
+          ) : (
+            <motion.div
+              className="flex flex-col items-center gap-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <motion.p className="text-3xl sm:text-4xl text-foreground text-center">
+                You said no 💔
+              </motion.p>
+              <motion.div className="text-4xl">💔</motion.div>
+              <button
+                onClick={() => navigate("/create")}
+                className="px-6 py-3 rounded-lg border-2 border-primary text-foreground hover:scale-105 active:scale-95 transition-all min-h-[48px]"
+              >
+                💌 Send Your Own Valentine
+              </button>
+            </motion.div>
+          )}
+        </div>
+      </PageTransition>
+    );
+  }
+
+  // SENDER VIEW - Watching status
+  if (role === 'sender') {
+    const CharacterComponent = character === "alpaca" ? PixelAlpaca : character === "dino" ? PixelDino : PixelPanda;
+
+    return (
+      <PageTransition>
+        <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
+        <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 gap-8" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+          <motion.h1
+            className="text-3xl sm:text-4xl text-foreground text-center"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            Your Valentine for {theirName}
+          </motion.h1>
+
+          <div className="flex items-end gap-8">
+            <CharacterComponent color="green" />
+            <CharacterComponent color="pink" mirror />
+          </div>
+
+          {valentine.status === 'sent' && (
+            <motion.div
+              className="text-center"
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+            >
+              <p className="text-xl text-muted-foreground">⏳ Waiting for {theirName} to open...</p>
+            </motion.div>
+          )}
+
+          {valentine.status === 'opened' && !valentine.receiver_choice && (
+            <motion.div
+              className="text-center"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              <p className="text-xl text-foreground">👀 {theirName} opened it!</p>
+              <p className="text-lg text-muted-foreground">💭 They're deciding...</p>
+            </motion.div>
+          )}
+
+          {valentine.status === 'complete' && valentine.receiver_choice === 'YES' && (
+            <motion.div
+              className="text-center flex flex-col items-center gap-4"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              <ConfettiHearts />
+              <p className="text-3xl text-foreground">🎉 {theirName} said YES!</p>
+              <MatchCertificate
+                yourName={yourName}
+                theirName={theirName}
+                character={character}
+                onSwitchCharacters={() => navigate("/create")}
+              />
+            </motion.div>
+          )}
+
+          {valentine.status === 'complete' && valentine.receiver_choice === 'NO' && (
+            <motion.div
+              className="text-center flex flex-col items-center gap-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <p className="text-2xl text-foreground">💔 {theirName} said no...</p>
+              <p className="text-lg text-muted-foreground">Better luck next time</p>
+              <button
+                onClick={() => navigate("/create")}
+                className="px-6 py-3 rounded-lg border-2 border-border text-foreground hover:scale-105 active:scale-95 transition-all min-h-[48px]"
+              >
+                💌 Send Another Valentine
+              </button>
+            </motion.div>
+          )}
+        </div>
+      </PageTransition>
+    );
+  }
+
+  // STRANGER VIEW
+  if (role === 'stranger') {
+    const CharacterComponent = character === "alpaca" ? PixelAlpaca : character === "dino" ? PixelDino : PixelPanda;
+
+    return (
+      <PageTransition>
+        <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 gap-8" style={{ fontFamily: "'Patrick Hand', cursive" }}>
+          {valentine.status === 'complete' ? (
+            <motion.div
+              className="flex flex-col items-center gap-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <h1 className="text-3xl text-foreground text-center">
+                {valentine.receiver_choice === 'YES' ? '💕 A Valentine Match!' : '💔 A Valentine Story'}
+              </h1>
+              <div className="flex items-end gap-8">
+                <div className="flex flex-col items-center gap-2">
+                  <CharacterComponent color="green" />
+                  <span className="text-lg">{yourName}</span>
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                  <CharacterComponent color="pink" mirror />
+                  <span className="text-lg">{theirName}</span>
+                </div>
+              </div>
+              <p className="text-xl text-muted-foreground text-center">
+                {valentine.receiver_choice === 'YES'
+                  ? `${yourName} and ${theirName} are a match! 💕`
+                  : `${theirName} said no to ${yourName}'s valentine`
+                }
+              </p>
+              <button
+                onClick={() => navigate("/create")}
+                className="px-6 py-3 rounded-lg border-2 border-primary text-foreground hover:scale-105 active:scale-95 transition-all min-h-[48px]"
+              >
+                💌 Send Your Own Valentine
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div
+              className="flex flex-col items-center gap-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <span className="text-4xl">💌</span>
+              <h1 className="text-2xl text-foreground text-center">
+                This valentine is for someone special
+              </h1>
+              <p className="text-lg text-muted-foreground text-center max-w-md">
+                This is a private valentine between {yourName} and {theirName}.
+              </p>
+              <button
+                onClick={() => navigate("/create")}
+                className="px-6 py-3 rounded-lg border-2 border-primary text-foreground hover:scale-105 active:scale-95 transition-all min-h-[48px]"
+              >
+                💌 Send Your Own Valentine →
+              </button>
+            </motion.div>
+          )}
+        </div>
+      </PageTransition>
+    );
+  }
+
+  // Fallback (should never reach here)
+  return null;
 };
 
 export default GamePage;

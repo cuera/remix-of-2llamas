@@ -1,16 +1,20 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { QRCodeSVG } from "qrcode.react";
 import PixelAlpaca from "./PixelAlpaca";
 import PixelDino from "./PixelDino";
 import PixelPanda from "./PixelPanda";
 import type { CharacterType } from "./CharacterSelect";
+import { useValentine } from "@/hooks/useValentine";
 
 interface ShareScreenProps {
   yourName: string;
   theirName: string;
   character: CharacterType;
   loveNote: string;
+  valentineId: string;
   onSendAnother: () => void;
   onPreviewAsReceiver: () => void;
 }
@@ -20,19 +24,22 @@ const ShareScreen = ({
   theirName,
   character,
   loveNote,
+  valentineId,
   onSendAnother,
   onPreviewAsReceiver,
 }: ShareScreenProps) => {
+  const navigate = useNavigate();
   const [showQR, setShowQR] = useState(false);
+  const { valentine } = useValentine(valentineId);
 
-  const shareUrl = "valentine-alpaca.app/v/demo123";
+  const shareUrl = `${window.location.origin}/v/${valentineId}`;
 
   const CharacterComponent =
     character === "alpaca" ? PixelAlpaca : character === "dino" ? PixelDino : PixelPanda;
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(`https://${shareUrl}`);
+      await navigator.clipboard.writeText(shareUrl);
       toast.success("Copied! ✓", { duration: 2000 });
     } catch {
       toast.error("Failed to copy");
@@ -41,7 +48,7 @@ const ShareScreen = ({
 
   const handleWhatsApp = () => {
     const text = encodeURIComponent(
-      `Hey ${theirName}! Someone has a Valentine question for you 💕 https://${shareUrl}`
+      `Hey ${theirName}! Someone has a Valentine question for you 💕 ${shareUrl}`
     );
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };
@@ -52,7 +59,7 @@ const ShareScreen = ({
         await navigator.share({
           title: `${yourName}'s Valentine for ${theirName}`,
           text: `Hey ${theirName}, will you be my Valentine? 💕`,
-          url: `https://${shareUrl}`,
+          url: shareUrl,
         });
       } catch (err) {
         if ((err as Error).name !== "AbortError") {
@@ -152,31 +159,91 @@ const ShareScreen = ({
         </button>
       </motion.div>
 
-      {/* QR Placeholder */}
+      {/* QR Code */}
       {showQR && (
         <motion.div
-          className="w-40 h-40 rounded-lg mb-6 flex items-center justify-center bg-white"
+          className="w-48 h-48 rounded-lg mb-6 flex items-center justify-center bg-white p-4"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", damping: 15, stiffness: 120 }}
         >
-          <span className="text-sm text-center px-2" style={{ color: "#666" }}>
-            QR Code
+          <QRCodeSVG
+            value={shareUrl}
+            size={160}
+            bgColor="transparent"
+            fgColor="#E91E8B"
+            level="M"
+          />
+        </motion.div>
+      )}
+
+      {/* Status - Realtime Updates */}
+      {valentine?.status === 'sent' && (
+        <motion.div
+          className="flex items-center gap-2 mb-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+        >
+          <span className="text-lg text-muted-foreground">
+            ⏳ Waiting for {theirName} to open...
           </span>
         </motion.div>
       )}
 
-      {/* Status */}
-      <motion.div
-        className="flex items-center gap-2 mb-8"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: [0.5, 1, 0.5] }}
-        transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-      >
-        <span className="text-lg text-muted-foreground">
-          ⏳ Waiting for {theirName} to open...
-        </span>
-      </motion.div>
+      {valentine?.status === 'opened' && !valentine.receiver_choice && (
+        <motion.div
+          className="flex flex-col items-center gap-2 mb-8"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", damping: 15, stiffness: 120 }}
+        >
+          <span className="text-lg text-foreground">
+            👀 {theirName} opened your valentine!
+          </span>
+          <span className="text-md text-muted-foreground">
+            💭 They're deciding...
+          </span>
+        </motion.div>
+      )}
+
+      {valentine?.status === 'complete' && valentine.receiver_choice === 'YES' && (
+        <motion.div
+          className="flex flex-col items-center gap-4 mb-8"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", damping: 15, stiffness: 120 }}
+        >
+          <span className="text-2xl text-foreground">
+            🎉 {theirName} said YES!
+          </span>
+          <button
+            onClick={() => navigate(`/v/${valentineId}`)}
+            className="px-6 py-2 rounded-lg bg-primary text-primary-foreground hover:scale-105 active:scale-95 transition-all min-h-[48px]"
+          >
+            See the result →
+          </button>
+        </motion.div>
+      )}
+
+      {valentine?.status === 'complete' && valentine.receiver_choice === 'NO' && (
+        <motion.div
+          className="flex flex-col items-center gap-4 mb-8"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", damping: 15, stiffness: 120 }}
+        >
+          <span className="text-2xl text-foreground">
+            💔 {theirName} said no...
+          </span>
+          <button
+            onClick={() => navigate(`/v/${valentineId}`)}
+            className="px-6 py-2 rounded-lg border-2 border-border text-foreground hover:scale-105 active:scale-95 transition-all min-h-[48px]"
+          >
+            See what happened →
+          </button>
+        </motion.div>
+      )}
 
       {/* Bottom Actions */}
       <motion.div

@@ -12,6 +12,7 @@ interface ShareState {
   theirName: string;
   loveNote: string;
   character: CharacterType;
+  valentineId: string;
 }
 
 const SharePage = () => {
@@ -33,7 +34,7 @@ const SharePage = () => {
   };
 
   const handlePreviewAsReceiver = () => {
-    navigate("/v/preview", { state });
+    navigate(`/v/${state.valentineId}`);
   };
 
   return (
@@ -45,6 +46,7 @@ const SharePage = () => {
         theirName={state.theirName}
         character={state.character}
         loveNote={state.loveNote}
+        valentineId={state.valentineId}
         onSendAnother={handleSendAnother}
         onPreviewAsReceiver={handlePreviewAsReceiver}
       />

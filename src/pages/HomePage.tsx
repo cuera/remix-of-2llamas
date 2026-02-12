@@ -4,11 +4,13 @@ import PixelAlpaca from "@/components/PixelAlpaca";
 import PixelDino from "@/components/PixelDino";
 import PixelPanda from "@/components/PixelPanda";
 import PageTransition from "@/components/PageTransition";
+import { useValentineCount } from "@/hooks/useValentineCount";
 
 const SPRING = { type: "spring" as const, damping: 15, stiffness: 120 };
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const { count, isLoading } = useValentineCount();
 
   return (
     <PageTransition>
@@ -73,7 +75,13 @@ const HomePage = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
         >
-          💌 2,847 valentines sent so far
+          {count === 0 ? (
+            "💌 Be the first to send a valentine!"
+          ) : count === null || isLoading ? (
+            "💌 Loading..."
+          ) : (
+            `💌 ${count.toLocaleString()} valentine${count === 1 ? '' : 's'} sent so far`
+          )}
         </motion.p>
 
         <motion.p
