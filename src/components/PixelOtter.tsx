@@ -1,35 +1,37 @@
 import { motion } from "framer-motion";
 
-// 0=transparent, 1=body, 2=dark/accent, 3=eye/nose
 const OTTER_GRID = [
-  [0,0,0,2,2,2,2,2,2,0,0,0],
-  [0,0,2,1,1,1,1,1,1,2,0,0],
-  [0,2,1,1,1,1,1,1,1,1,2,0],
-  [0,2,1,3,1,1,1,1,3,1,2,0],
-  [0,2,1,1,1,3,3,1,1,1,2,0],
-  [0,0,2,1,1,1,1,1,1,2,0,0],
-  [0,0,0,2,1,1,1,1,2,0,0,0],
-  [0,0,2,1,1,1,1,1,1,2,0,0],
-  [0,2,1,1,1,1,1,1,1,1,2,0],
-  [2,1,1,1,1,1,1,1,1,1,1,2],
-  [2,1,1,1,1,1,1,1,1,1,1,2],
-  [0,2,1,1,1,1,1,1,1,1,2,0],
-  [0,0,2,1,1,1,1,1,1,2,0,0],
-  [0,0,2,2,0,0,0,0,2,2,0,0],
-  [0,0,2,2,0,0,0,0,2,2,0,0],
+  [0, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 0],  // row 0  - ears
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],  // row 1  - top of head
+  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],  // row 2  - head
+  [0, 1, 1, 3, 1, 2, 2, 1, 3, 1, 1, 0],  // row 3  - eyes + muzzle
+  [0, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 0],  // row 4  - cheeks
+  [0, 0, 1, 2, 2, 4, 4, 2, 2, 1, 0, 0],  // row 5  - nose
+  [0, 0, 1, 1, 2, 2, 2, 2, 1, 1, 0, 0],  // row 6  - chin
+  [0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0],  // row 7  - neck
+  [0, 0, 1, 1, 2, 2, 2, 2, 1, 1, 0, 0],  // row 8  - upper body + belly
+  [0, 5, 1, 1, 2, 2, 2, 2, 1, 1, 5, 0],  // row 9  - arms out
+  [0, 0, 1, 1, 2, 2, 2, 2, 1, 1, 0, 0],  // row 10 - mid body
+  [0, 0, 1, 1, 2, 2, 2, 2, 1, 1, 0, 0],  // row 11 - lower body
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],  // row 12 - hips
+  [0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0],  // row 13 - legs
+  [0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0],  // row 14 - feet
+  [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0],  // row 15 - tail
 ];
 
-const COLOR_MAP = {
+const OTTER_COLORS = {
   green: {
-    body: "hsl(140 60% 70%)",
-    dark: "hsl(140 60% 35%)",
-    eye: "hsl(var(--background))",
+    main: "hsl(140 50% 40%)",   // body
+    belly: "hsl(140 30% 72%)",  // belly/face
+    nose: "hsl(140 25% 22%)",   // nose
+    mid: "hsl(140 45% 33%)",    // mid-tone
   },
   pink: {
-    body: "hsl(330 80% 75%)",
-    dark: "hsl(330 70% 40%)",
-    eye: "hsl(var(--background))",
-  },
+    main: "hsl(330 60% 52%)",
+    belly: "hsl(330 45% 82%)",
+    nose: "hsl(330 40% 32%)",
+    mid: "hsl(330 55% 42%)",
+  }
 };
 
 interface PixelOtterProps {
@@ -40,7 +42,7 @@ interface PixelOtterProps {
 }
 
 const PixelOtter = ({ color, mirror = false, className = "", confused = false }: PixelOtterProps) => {
-  const colors = COLOR_MAP[color];
+  const colors = OTTER_COLORS[color];
 
   const grid = mirror
     ? OTTER_GRID.map(row => [...row].reverse())
@@ -48,9 +50,14 @@ const PixelOtter = ({ color, mirror = false, className = "", confused = false }:
 
   const getCellColor = (cell: number) => {
     if (cell === 0) return "transparent";
-    if (cell === 3) return colors.eye;
-    if (cell === 2) return colors.dark;
-    return colors.body;
+    if (cell === 3) return "hsl(var(--background))"; // Eye
+    switch (cell) {
+      case 1: return colors.main;
+      case 2: return colors.belly;
+      case 4: return colors.nose;
+      case 5: return colors.mid;
+      default: return colors.main;
+    }
   };
 
   return (
@@ -70,7 +77,7 @@ const PixelOtter = ({ color, mirror = false, className = "", confused = false }:
                 width: "var(--pixel-size)",
                 height: "var(--pixel-size)",
                 backgroundColor: getCellColor(cell),
-                boxShadow: cell ? `inset -1px -1px 0 ${colors.dark}` : "none",
+                boxShadow: cell ? `inset -1px -1px 0 rgba(0,0,0,0.1)` : "none",
               }}
             />
           ))

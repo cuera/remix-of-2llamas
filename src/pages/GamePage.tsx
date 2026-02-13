@@ -30,7 +30,7 @@ const DEFAULT_STATE: GameState = {
   yourName: "Someone",
   theirName: "You",
   loveNote: "",
-  character: "dino",
+  character: "llama",
 };
 
 const SPRING = { type: "spring" as const, damping: 15, stiffness: 120 };
@@ -131,7 +131,8 @@ const GamePage = () => {
   // Extract valentine data and map character type back to singular
   const yourName = valentine.sender_name;
   const theirName = valentine.receiver_name;
-  const character = valentine.character_type.replace(/s$/, '') as CharacterType;
+  const rawCharacter = valentine.character_type.replace(/s$/, '');
+  const character = (rawCharacter === 'dino' ? 'llama' : rawCharacter) as CharacterType;
   const loveNote = valentine.love_note || '';
 
   // ROLE-BASED RENDERING

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import PixelAlpaca from "@/components/PixelAlpaca";
-import PixelDino from "@/components/PixelDino";
+import PixelLlama from "@/components/PixelLlama";
 import PixelPanda from "@/components/PixelPanda";
 import ChoiceButton from "@/components/ChoiceButton";
 import ConfettiHearts from "@/components/ConfettiHearts";
@@ -157,8 +157,8 @@ const Index = () => {
 
   // Game board phase
   const bothChosen = rightChoice !== null;
-  const CharacterComponent = character === "alpaca" ? PixelAlpaca : character === "dino" ? PixelDino : PixelPanda;
-  const approachDist = character === "alpaca" ? 55 : character === "dino" ? 48 : 55;
+  const CharacterComponent = character === "alpaca" ? PixelAlpaca : character === "llama" ? PixelLlama : PixelPanda;
+  const approachDist = character === "alpaca" ? 55 : character === "llama" ? 48 : 55;
   const celebrating = matchPhase === "celebrating";
 
   return (

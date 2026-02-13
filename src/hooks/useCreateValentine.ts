@@ -5,7 +5,7 @@ import { getVisitorId } from '@/lib/visitor'
 interface CreateValentineParams {
   senderName: string
   receiverName: string
-  characterType: 'alpaca' | 'dino' | 'panda' | 'otter' | 'lobster' | 'penguin'
+  characterType: 'alpaca' | 'llama' | 'panda' | 'otter' | 'lobster' | 'penguin'
   loveNote?: string
 }
 

@@ -1,36 +1,37 @@
 import { motion } from "framer-motion";
 
-// 0=transparent, 1=body, 2=dark/shell, 3=eye, 4=claw
 const LOBSTER_GRID = [
-  [0,4,4,0,0,0,0,0,0,0,0,4,4,0],
-  [4,4,4,0,0,0,0,0,0,0,4,4,4,0],
-  [0,4,0,0,0,2,2,2,2,0,0,0,4,0],
-  [0,0,0,0,2,1,1,1,1,2,0,0,0,0],
-  [0,0,0,2,1,3,1,1,3,1,2,0,0,0],
-  [0,0,0,2,1,1,1,1,1,1,2,0,0,0],
-  [0,0,0,0,2,1,1,1,1,2,0,0,0,0],
-  [0,0,0,0,0,2,1,1,2,0,0,0,0,0],
-  [0,0,0,0,2,1,1,1,1,2,0,0,0,0],
-  [0,0,0,2,1,1,1,1,1,1,2,0,0,0],
-  [0,0,0,2,1,1,1,1,1,1,2,0,0,0],
-  [0,0,0,0,2,2,1,1,2,2,0,0,0,0],
-  [0,0,0,0,0,2,2,2,2,0,0,0,0,0],
-  [0,0,0,0,2,2,0,0,2,2,0,0,0,0],
+  [0, 2, 2, 0, 0, 0, 0, 0, 0, 2, 2, 0],  // row 0  - claw tips
+  [2, 2, 2, 0, 0, 0, 0, 0, 2, 2, 2, 0],  // row 1  - claws
+  [0, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0],  // row 2  - claw base
+  [0, 0, 2, 1, 0, 0, 0, 1, 2, 0, 0, 0],  // row 3  - arms
+  [0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0],  // row 4  - top of head
+  [0, 0, 1, 1, 3, 1, 3, 1, 1, 0, 0, 0],  // row 5  - eyes
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],  // row 6  - face
+  [0, 0, 0, 1, 4, 4, 4, 1, 0, 0, 0, 0],  // row 7  - accent stripe
+  [0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0],  // row 8  - upper body
+  [0, 0, 0, 1, 4, 1, 4, 1, 0, 0, 0, 0],  // row 9  - body stripe
+  [0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0],  // row 10 - body
+  [0, 0, 0, 1, 4, 1, 4, 1, 0, 0, 0, 0],  // row 11 - body stripe
+  [0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0],  // row 12 - lower body
+  [0, 0, 5, 0, 1, 1, 1, 0, 5, 0, 0, 0],  // row 13 - upper legs
+  [0, 5, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0],  // row 14 - lower legs
+  [0, 0, 0, 0, 5, 0, 5, 0, 0, 0, 0, 0],  // row 15 - tail fan
 ];
 
-const COLOR_MAP = {
+const LOBSTER_COLORS = {
   green: {
-    body: "hsl(140 60% 65%)",
-    shell: "hsl(140 60% 35%)",
-    eye: "hsl(var(--background))",
-    claw: "hsl(140 60% 45%)",
+    main: "hsl(140 55% 45%)",    // body
+    claw: "hsl(140 60% 38%)",    // claw
+    accent: "hsl(140 45% 55%)",  // accent
+    legs: "hsl(140 50% 40%)",    // legs
   },
   pink: {
-    body: "hsl(330 80% 70%)",
-    shell: "hsl(330 70% 38%)",
-    eye: "hsl(var(--background))",
-    claw: "hsl(330 80% 55%)",
-  },
+    main: "hsl(330 75% 58%)",    // body
+    claw: "hsl(330 80% 48%)",    // claw
+    accent: "hsl(330 65% 70%)",  // accent
+    legs: "hsl(330 70% 52%)",    // legs
+  }
 };
 
 interface PixelLobsterProps {
@@ -41,7 +42,7 @@ interface PixelLobsterProps {
 }
 
 const PixelLobster = ({ color, mirror = false, className = "", confused = false }: PixelLobsterProps) => {
-  const colors = COLOR_MAP[color];
+  const colors = LOBSTER_COLORS[color];
 
   const grid = mirror
     ? LOBSTER_GRID.map(row => [...row].reverse())
@@ -49,10 +50,14 @@ const PixelLobster = ({ color, mirror = false, className = "", confused = false 
 
   const getCellColor = (cell: number) => {
     if (cell === 0) return "transparent";
-    if (cell === 3) return colors.eye;
-    if (cell === 4) return colors.claw;
-    if (cell === 2) return colors.shell;
-    return colors.body;
+    if (cell === 3) return "hsl(var(--background))"; // Eye
+    switch (cell) {
+      case 1: return colors.main;
+      case 2: return colors.claw;
+      case 4: return colors.accent;
+      case 5: return colors.legs;
+      default: return colors.main;
+    }
   };
 
   return (
@@ -72,7 +77,7 @@ const PixelLobster = ({ color, mirror = false, className = "", confused = false 
                 width: "var(--pixel-size)",
                 height: "var(--pixel-size)",
                 backgroundColor: getCellColor(cell),
-                boxShadow: cell ? `inset -1px -1px 0 ${colors.shell}` : "none",
+                boxShadow: cell ? `inset -1px -1px 0 rgba(0,0,0,0.1)` : "none",
               }}
             />
           ))

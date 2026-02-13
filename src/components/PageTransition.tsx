@@ -7,7 +7,7 @@ const PageTransition = ({ children }: { children: ReactNode }) => (
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0, y: 12 }}
     transition={{ duration: 0.3, ease: "easeOut" }}
-    className="min-h-screen"
+    className="w-full"
   >
     {children}
   </motion.div>
