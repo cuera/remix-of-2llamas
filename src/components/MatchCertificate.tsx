@@ -1,8 +1,8 @@
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import { toPng } from "html-to-image";
-import { Instagram } from "lucide-react"; // Import Instagram icon
-import { CHARACTER_MAP } from "@/lib/characters";
+import { Instagram } from "lucide-react";
+import { CHARACTER_MAP, getWordplay } from "@/lib/characters";
 import type { CharacterType } from "./CharacterSelect";
 
 interface MatchCertificateProps {
@@ -19,8 +19,18 @@ const MatchCertificate = ({
   onSendBack,
 }: MatchCertificateProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   const CharacterComponent = CHARACTER_MAP[character];
+  const wordplay = getWordplay(character, yourName + theirName);
+
+  // Auto-scroll to card after it appears
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      wrapperRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 3600);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleDownload = useCallback(async () => {
     if (!cardRef.current) return;
@@ -72,12 +82,36 @@ const MatchCertificate = ({
 
   return (
     <motion.div
+      ref={wrapperRef}
       className="flex flex-col items-center w-full px-4 relative z-10"
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 1.0, duration: 0.8, type: "spring", bounce: 0.4 }}
+      transition={{ delay: 3.0, duration: 0.8, type: "spring", bounce: 0.4 }}
       style={{ fontFamily: "'Patrick Hand', cursive" }}
     >
+      {/* "Your card is ready" indicator */}
+      <motion.div
+        className="flex flex-col items-center mb-3"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 3.0, duration: 0.5 }}
+      >
+        <motion.p
+          className="text-lg text-foreground mb-1"
+          animate={{ opacity: [0, 1, 1, 0] }}
+          transition={{ delay: 3.2, duration: 3, times: [0, 0.1, 0.7, 1] }}
+        >
+          Your card is ready!
+        </motion.p>
+        <motion.span
+          className="text-2xl"
+          animate={{ y: [0, 8, 0] }}
+          transition={{ repeat: 3, duration: 0.6, ease: "easeInOut", delay: 3.0 }}
+        >
+          👇
+        </motion.span>
+      </motion.div>
+
       {/* 4:5 Premium Card */}
       <div
         ref={cardRef}
@@ -184,6 +218,15 @@ const MatchCertificate = ({
             }}
           >
             It's a match!
+          </p>
+          <p
+            className="text-sm sm:text-base italic tracking-wide z-10 mt-1 px-4 text-center"
+            style={{
+              color: "rgba(255,255,255,0.85)",
+              textShadow: "0 0 8px rgba(255,105,180,0.5)",
+            }}
+          >
+            "{wordplay}"
           </p>
         </div>
 

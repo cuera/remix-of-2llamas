@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { CHARACTER_MAP, APPROACH_DIST } from "@/lib/characters";
+import { CHARACTER_MAP, APPROACH_DIST, getWordplay } from "@/lib/characters";
 import ConfettiHearts from "@/components/ConfettiHearts";
 import MatchCertificate from "@/components/MatchCertificate";
 import DodgeNoButton from "@/components/DodgeNoButton";
@@ -53,6 +53,8 @@ const GamePage = () => {
   const [noDodgeCount, setNoDodgeCount] = useState(0);
   const [shakeRight, setShakeRight] = useState(false);
   const [showCountdown, setShowCountdown] = useState(false);
+  const [centerY, setCenterY] = useState(-80);
+  const characterRowRef = useRef<HTMLDivElement>(null);
 
   // Callbacks and effects for receiver game
   const handleIntroComplete = useCallback(() => {
@@ -92,6 +94,18 @@ const GamePage = () => {
       clearTimeout(celebrateTimer);
     };
   }, [outcome]);
+
+  // Dynamic viewport centering for kiss animation
+  useEffect(() => {
+    if (showOutcome && outcome === "match" && characterRowRef.current) {
+      requestAnimationFrame(() => {
+        const rect = characterRowRef.current!.getBoundingClientRect();
+        const viewportCenter = window.innerHeight / 2;
+        const elementCenter = rect.top + rect.height / 2;
+        setCenterY(viewportCenter - elementCenter);
+      });
+    }
+  }, [showOutcome, outcome]);
 
   // Loading state
   if (isLoading) {
@@ -173,20 +187,27 @@ const GamePage = () => {
           {showCountdown && <CountdownOverlay onComplete={handleCountdownComplete} onTick={sound.playCountdown} />}
           {celebrating && <ConfettiHearts />}
 
-          <motion.h1
-            className="text-3xl sm:text-4xl md:text-5xl text-foreground mb-8 sm:mb-12 text-center"
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={SPRING}
-          >
-            {theirName}, will you be {yourName}'s Valentine?
-          </motion.h1>
+          <AnimatePresence>
+            {!showOutcome && (
+              <motion.h1
+                key="valentine-heading"
+                className="text-3xl sm:text-4xl md:text-5xl text-foreground mb-8 sm:mb-12 text-center"
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ opacity: 0, y: -30, transition: { duration: 0.4 } }}
+                transition={SPRING}
+              >
+                {theirName}, will you be {yourName}'s Valentine?
+              </motion.h1>
+            )}
+          </AnimatePresence>
 
           <motion.div
-            className="flex flex-row items-end justify-center w-full gap-4 sm:gap-12 md:gap-20"
+            ref={characterRowRef}
+            className="flex flex-row items-end justify-center w-full gap-4 sm:gap-12 md:gap-20 relative"
             animate={
               showOutcome && outcome === "match"
-                ? { y: -80, scale: 1.1 }
+                ? { y: centerY, scale: 1.25 }
                 : {}
             }
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -244,6 +265,22 @@ const GamePage = () => {
                 >
                   ❤️
                 </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Wordplay text during celebration */}
+            <AnimatePresence>
+              {celebrating && (
+                <motion.p
+                  key="wordplay-celebration"
+                  className="absolute -bottom-14 text-lg sm:text-2xl text-foreground text-center max-w-[90vw]"
+                  style={{ textShadow: "0 0 10px hsl(var(--brand-pink))" }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.6 }}
+                >
+                  {getWordplay(character, yourName + theirName)}
+                </motion.p>
               )}
             </AnimatePresence>
 
