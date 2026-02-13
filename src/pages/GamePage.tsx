@@ -166,7 +166,7 @@ const GamePage = () => {
     return (
       <PageTransition>
         <div
-          className="min-h-screen flex flex-col items-center justify-center px-4 py-8 overflow-hidden relative"
+          className="min-h-[100dvh] flex flex-col items-center justify-center px-4 py-8 overflow-hidden relative"
           style={{ fontFamily: "'Patrick Hand', cursive" }}
         >
           <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
@@ -182,7 +182,15 @@ const GamePage = () => {
             {theirName}, will you be {yourName}'s Valentine?
           </motion.h1>
 
-          <div className="flex flex-row items-end justify-center w-full gap-4 sm:gap-12 md:gap-20">
+          <motion.div
+            className="flex flex-row items-end justify-center w-full gap-4 sm:gap-12 md:gap-20"
+            animate={
+              showOutcome && outcome === "match"
+                ? { y: -80, scale: 1.1 }
+                : {}
+            }
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
             {/* Left - Sender (Green) */}
             <motion.div
               className="flex flex-col items-center gap-2 sm:gap-4"
@@ -346,7 +354,7 @@ const GamePage = () => {
                 </div>
               )}
             </motion.div>
-          </div>
+          </motion.div>
 
           {/* Outcome */}
           <AnimatePresence>
