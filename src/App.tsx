@@ -9,6 +9,7 @@ import CreatePage from "./pages/CreatePage";
 import SharePage from "./pages/SharePage";
 import GamePage from "./pages/GamePage";
 import NotFound from "./pages/NotFound";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const AnimatedRoutes = () => {
         <Route path="/create" element={<CreatePage />} />
         <Route path="/share" element={<SharePage />} />
         <Route path="/v/:id" element={<GamePage />} />
+        <Route path="/otterly-admin" element={<AdminDashboard />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
