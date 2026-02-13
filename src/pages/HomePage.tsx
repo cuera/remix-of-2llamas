@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import MorphingCharacter from "@/components/MorphingCharacter";
 import PageTransition from "@/components/PageTransition";
-import { useValentineCount } from "@/hooks/useValentineCount";
+import { useValentineCount, COUNTER_OFFSET } from "@/hooks/useValentineCount";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -156,12 +156,10 @@ const HomePage = () => {
                 <p className="text-muted-foreground font-semibold tracking-wide
                               text-sm
                               md:text-xl">
-                  {count === 0 ? (
-                    "💌 Be the first hero!"
-                  ) : count === null || isLoading ? (
+                  {count === null || isLoading ? (
                     "💌 Magic loading..."
                   ) : (
-                    `💌 ${count.toLocaleString()} valentines sent so far`
+                    `💌 ${(count + COUNTER_OFFSET).toLocaleString()} valentines sent so far`
                   )}
                 </p>
               </motion.div>

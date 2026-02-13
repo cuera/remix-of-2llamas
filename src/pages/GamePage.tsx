@@ -12,6 +12,8 @@ import PageTransition from "@/components/PageTransition";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { useValentine } from "@/hooks/useValentine";
 import { useSubmitChoice } from "@/hooks/useSubmitChoice";
+import { COUNTER_OFFSET } from "@/hooks/useValentineCount";
+import { supabase } from "@/lib/supabase";
 import type { CharacterType } from "@/components/CharacterSelect";
 
 type Choice = null | "YES" | "NO";
@@ -54,7 +56,20 @@ const GamePage = () => {
   const [shakeRight, setShakeRight] = useState(false);
   const [showCountdown, setShowCountdown] = useState(false);
   const [centerY, setCenterY] = useState(-80);
+  const [cardNumber, setCardNumber] = useState<number>(0);
   const characterRowRef = useRef<HTMLDivElement>(null);
+
+  // Compute card number (rank + offset) for this valentine
+  useEffect(() => {
+    if (!valentine) return;
+    supabase
+      .from('valentines')
+      .select('id', { count: 'exact', head: true })
+      .lte('created_at', valentine.created_at)
+      .then(({ count }) => {
+        setCardNumber((count || 0) + COUNTER_OFFSET);
+      });
+  }, [valentine]);
 
   // Callbacks and effects for receiver game
   const handleIntroComplete = useCallback(() => {
@@ -401,6 +416,7 @@ const GamePage = () => {
                   yourName={yourName}
                   theirName={theirName}
                   character={character}
+                  cardNumber={cardNumber}
                   onSendBack={() => navigate(`/create?from=${encodeURIComponent(theirName)}&to=${encodeURIComponent(yourName)}`, { replace: true })}
                 />
               ) : (
@@ -495,6 +511,7 @@ const GamePage = () => {
                 yourName={yourName}
                 theirName={theirName}
                 character={character}
+                cardNumber={cardNumber}
                 onSendBack={() => navigate(`/create?from=${encodeURIComponent(theirName)}&to=${encodeURIComponent(yourName)}`, { replace: true })}
               />
             </>
@@ -575,6 +592,7 @@ const GamePage = () => {
                 yourName={yourName}
                 theirName={theirName}
                 character={character}
+                cardNumber={cardNumber}
                 onSendBack={() => navigate("/create")}
               />
             </motion.div>

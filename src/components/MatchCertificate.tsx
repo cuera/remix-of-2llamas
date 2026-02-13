@@ -9,6 +9,7 @@ interface MatchCertificateProps {
   yourName: string;
   theirName: string;
   character: CharacterType;
+  cardNumber?: number;
   onSendBack: () => void;
 }
 
@@ -16,6 +17,7 @@ const MatchCertificate = ({
   yourName,
   theirName,
   character,
+  cardNumber,
   onSendBack,
 }: MatchCertificateProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -188,7 +190,7 @@ const MatchCertificate = ({
             ))}
           </div>
 
-          <div className="flex items-end gap-4 z-10 scale-110 sm:scale-125 mb-4">
+          <div className="flex items-end gap-4 z-10 scale-75 sm:scale-90 mb-4">
             <motion.div
               animate={{ y: [0, -5, 0], rotate: -3 }}
               transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
@@ -244,7 +246,7 @@ const MatchCertificate = ({
             <span className="text-xs font-mono font-bold tracking-wider">otterlyinlove.info</span>
           </div>
           <div className="text-xs font-mono text-gray-300">
-            #001
+            #{(cardNumber ?? 0).toString().padStart(7, '0')}
           </div>
         </div>
       </div>

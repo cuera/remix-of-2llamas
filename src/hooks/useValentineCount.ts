@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 
+export const COUNTER_OFFSET = 1008
+
 export function useValentineCount() {
   const [count, setCount] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(true)
