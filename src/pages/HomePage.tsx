@@ -234,6 +234,18 @@ const HomePage = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* Footer credit */}
+        <div className="absolute bottom-3 left-0 right-0 text-center">
+          <a
+            href="https://ig.me/m/kakashikernel"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[10px] md:text-xs text-muted-foreground/30 hover:text-muted-foreground/50 transition-colors"
+          >
+            created otterly with ❤️ by @kakashikernel
+          </a>
+        </div>
       </div>
     </PageTransition>
   );
