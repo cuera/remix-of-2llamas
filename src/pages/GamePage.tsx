@@ -140,296 +140,298 @@ const GamePage = () => {
   // RECEIVER VIEW - Show game if receiver hasn't chosen yet
   if (role === 'receiver' && !valentine.receiver_choice) {
     if (phase === "intro") {
+      return (
+        <PageTransition>
+          <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
+          <IntroSequence character={character} yourName={yourName} loveNote={loveNote} onComplete={handleIntroComplete} />
+        </PageTransition>
+      );
+    }
+
+    const bothChosen = rightChoice !== null;
+    const CharacterComponent = CHARACTER_MAP[character];
+    const approachDist = APPROACH_DIST[character];
+    const celebrating = matchPhase === "celebrating";
+
+    const DODGE_TEXTS = [
+      "",
+      "Really? 🥺",
+      "But look at us... 💕",
+      "Pookie please... 🥺",
+      "I'll be so sad... 😢",
+      "Fine... but you're missing out 💔",
+    ];
+    const dodgeText = DODGE_TEXTS[Math.min(noDodgeCount, DODGE_TEXTS.length - 1)];
+
     return (
       <PageTransition>
-        <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
-        <IntroSequence character={character} yourName={yourName} loveNote={loveNote} onComplete={handleIntroComplete} />
-      </PageTransition>
-    );
-  }
-
-  const bothChosen = rightChoice !== null;
-  const CharacterComponent = CHARACTER_MAP[character];
-  const approachDist = APPROACH_DIST[character];
-  const celebrating = matchPhase === "celebrating";
-
-  const DODGE_TEXTS = [
-    "",
-    "Really? 🥺",
-    "But look at us... 💕",
-    "Pookie please... 🥺",
-    "I'll be so sad... 😢",
-    "Fine... but you're missing out 💔",
-  ];
-  const dodgeText = DODGE_TEXTS[Math.min(noDodgeCount, DODGE_TEXTS.length - 1)];
-
-  return (
-    <PageTransition>
-      <div
-        className="min-h-screen flex flex-col items-center justify-center px-4 py-8 overflow-hidden relative"
-        style={{ fontFamily: "'Patrick Hand', cursive" }}
-      >
-        <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
-        {showCountdown && <CountdownOverlay onComplete={handleCountdownComplete} onTick={sound.playCountdown} />}
-        {celebrating && <ConfettiHearts />}
-
-        <motion.h1
-          className="text-3xl sm:text-4xl md:text-5xl text-foreground mb-8 sm:mb-12 text-center"
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={SPRING}
+        <div
+          className="min-h-screen flex flex-col items-center justify-center px-4 py-8 overflow-hidden relative"
+          style={{ fontFamily: "'Patrick Hand', cursive" }}
         >
-          {theirName}, will you be {yourName}'s Valentine?
-        </motion.h1>
+          <SoundToggle muted={sound.muted} onToggle={sound.toggleMute} />
+          {showCountdown && <CountdownOverlay onComplete={handleCountdownComplete} onTick={sound.playCountdown} />}
+          {celebrating && <ConfettiHearts />}
 
-        <div className="flex flex-col sm:flex-row items-center sm:items-end gap-8 sm:gap-12 md:gap-20">
-          {/* Left - Sender (Green) */}
-          <motion.div
-            className="flex flex-col items-center gap-4"
-            animate={
-              showOutcome
-                ? outcome === "match"
-                  ? { x: matchPhase === "approaching" ? approachDist : matchPhase === "pecking" ? approachDist + 8 : approachDist - 5 }
-                  : { y: 5, rotate: -3 }
-                : {}
-            }
-            transition={{ duration: 0.8, ease: "easeInOut" }}
+          <motion.h1
+            className="text-3xl sm:text-4xl md:text-5xl text-foreground mb-8 sm:mb-12 text-center"
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={SPRING}
           >
-            <motion.div
-              animate={
-                celebrating
-                  ? { y: [0, -15, 0], rotate: 0 }
-                  : noDodgeCount >= 3
-                  ? { y: [0, -8, 0], rotate: -5 }
-                  : noDodgeCount >= 1
-                  ? { y: [0, -6, 0], rotate: -5 }
-                  : { y: [0, -6, 0], rotate: 0 }
-              }
-              transition={
-                celebrating
-                  ? { repeat: Infinity, duration: 0.5 }
-                  : noDodgeCount >= 3
-                  ? { repeat: Infinity, duration: 0.6, ease: "easeInOut" }
-                  : { repeat: Infinity, duration: 1.5, ease: "easeInOut" }
-              }
-            >
-              <CharacterComponent color="green" />
-            </motion.div>
-            {!showOutcome && (
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-xl text-foreground tracking-wide">{yourName}</span>
-                <span className="text-sm text-muted-foreground">asked you to be their valentine 💚</span>
-              </div>
-            )}
-          </motion.div>
+            {theirName}, will you be {yourName}'s Valentine?
+          </motion.h1>
 
-          {/* Heart between */}
-          <AnimatePresence>
-            {celebrating && (
+          <div className="flex flex-row items-end justify-center w-full gap-4 sm:gap-12 md:gap-20">
+            {/* Left - Sender (Green) */}
+            <motion.div
+              className="flex flex-col items-center gap-2 sm:gap-4"
+              animate={
+                showOutcome
+                  ? outcome === "match"
+                    ? { x: matchPhase === "approaching" ? approachDist : matchPhase === "pecking" ? approachDist + 8 : approachDist - 5 }
+                    : { y: 5, rotate: -3 }
+                  : {}
+              }
+              transition={{ duration: 0.8, ease: "easeInOut" }}
+            >
               <motion.div
-                className="text-5xl sm:text-6xl absolute"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: [1, 1.3, 1], opacity: 1 }}
-                transition={{ repeat: Infinity, duration: 1 }}
-                style={{ zIndex: 10 }}
+                className="origin-bottom scale-[0.6] sm:scale-100"
+                animate={
+                  celebrating
+                    ? { y: [0, -15, 0], rotate: 0 }
+                    : noDodgeCount >= 3
+                      ? { y: [0, -8, 0], rotate: -5 }
+                      : noDodgeCount >= 1
+                        ? { y: [0, -6, 0], rotate: -5 }
+                        : { y: [0, -6, 0], rotate: 0 }
+                }
+                transition={
+                  celebrating
+                    ? { repeat: Infinity, duration: 0.5 }
+                    : noDodgeCount >= 3
+                      ? { repeat: Infinity, duration: 0.6, ease: "easeInOut" }
+                      : { repeat: Infinity, duration: 1.5, ease: "easeInOut" }
+                }
               >
-                ❤️
+                <CharacterComponent color="green" />
               </motion.div>
+              {!showOutcome && (
+                <div className="flex flex-col items-center gap-0 sm:gap-1">
+                  <span className="text-base sm:text-xl text-foreground tracking-wide whitespace-nowrap">{yourName}</span>
+                  <span className="text-xs sm:text-sm text-muted-foreground text-center">asked you to be<br className="sm:hidden" /> their valentine 💚</span>
+                </div>
+              )}
+            </motion.div>
+
+            {/* Heart between */}
+            <AnimatePresence>
+              {celebrating && (
+                <motion.div
+                  className="text-5xl sm:text-6xl absolute"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: [1, 1.3, 1], opacity: 1 }}
+                  transition={{ repeat: Infinity, duration: 1 }}
+                  style={{ zIndex: 10 }}
+                >
+                  ❤️
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Right - Receiver (Pink) */}
+            <motion.div
+              className="flex flex-col items-center gap-2 sm:gap-4"
+              animate={
+                showOutcome
+                  ? outcome === "match"
+                    ? { x: matchPhase === "approaching" ? -approachDist : matchPhase === "pecking" ? -(approachDist + 8) : -(approachDist - 5) }
+                    : rightChoice === "NO"
+                      ? { x: 300, opacity: 0 }
+                      : {}
+                  : {}
+              }
+              transition={{ duration: 0.8, ease: "easeInOut" }}
+            >
+              <motion.div
+                className="origin-bottom scale-[0.6] sm:scale-100"
+                animate={
+                  celebrating
+                    ? { y: [0, -15, 0] }
+                    : shakeRight
+                      ? { rotate: [0, -5, 5, -3, 3, 0] }
+                      : {}
+                }
+                transition={
+                  celebrating
+                    ? { repeat: Infinity, duration: 0.5, delay: 0.25 }
+                    : shakeRight
+                      ? { duration: 0.4 }
+                      : {}
+                }
+                onAnimationComplete={() => setShakeRight(false)}
+              >
+                <CharacterComponent color="pink" mirror confused={outcome === "mismatch"} />
+              </motion.div>
+              {!showOutcome && (
+                <div className="flex flex-col items-center gap-2 sm:gap-2">
+                  <span className="text-base sm:text-xl text-foreground tracking-wide whitespace-nowrap">{theirName}</span>
+                  <div className="flex gap-2 sm:gap-3 items-center">
+                    <motion.div
+                      animate={{
+                        scale: noDodgeCount >= 5 ? 1.6 : noDodgeCount >= 4 ? 1.4 : noDodgeCount >= 3 ? 1.2 : noDodgeCount >= 2 ? 1.1 : 1,
+                        boxShadow: noDodgeCount >= 4
+                          ? "0 0 20px hsl(var(--brand-pink)), 0 0 40px hsl(var(--brand-pink))"
+                          : "none",
+                      }}
+                      transition={SPRING}
+                      style={{ borderRadius: "0.375rem" }}
+                    >
+                      <button
+                        onClick={async () => {
+                          setRightChoice("YES");
+                          sound.playDing();
+                          await submitChoice('YES');
+                        }}
+                        disabled={bothChosen || isSubmitting}
+                        className="px-4 py-2 text-sm sm:px-7 sm:py-3 sm:text-xl font-hand rounded-md border-[2px] sm:border-[3px] transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 min-h-[36px] sm:min-h-[48px] whitespace-nowrap"
+                        style={{
+                          borderColor: "hsl(var(--brand-green))",
+                          backgroundColor: rightChoice === "YES" ? "hsl(var(--brand-green))" : "transparent",
+                          color: rightChoice === "YES" ? "hsl(var(--background))" : "hsl(var(--foreground))",
+                          fontFamily: "'Patrick Hand', cursive",
+                        }}
+                      >
+                        YES 💚
+                      </button>
+                    </motion.div>
+                    <DodgeNoButton
+                      color="pink"
+                      selected={rightChoice === "NO"}
+                      onClick={async () => {
+                        setRightChoice("NO");
+                        sound.playBloop();
+                        await submitChoice('NO');
+                      }}
+                      disabled={bothChosen || isSubmitting}
+                      dodgeCount={noDodgeCount}
+                      onDodge={() => {
+                        setNoDodgeCount((c) => c + 1);
+                        setShakeRight(true);
+                        sound.playDodge();
+                      }}
+                      customStyle={{
+                        borderColor: "hsl(var(--muted-foreground))",
+                        fontSize: "0.8rem",
+                        padding: "0.25rem 0.5rem",
+                        opacity: 0.7,
+                      }}
+                    />
+                  </div>
+                  <AnimatePresence>
+                    {noDodgeCount > 0 && (
+                      <motion.p
+                        key={noDodgeCount}
+                        className="text-xs sm:text-sm mt-1 text-center"
+                        style={{ color: "hsl(var(--brand-pink))", fontFamily: "'Patrick Hand', cursive" }}
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        {dodgeText}
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
+            </motion.div>
+          </div>
+
+          {/* Outcome */}
+          <AnimatePresence>
+            {showOutcome && (
+              outcome === "match" ? (
+                <MatchCertificate
+                  yourName={yourName}
+                  theirName={theirName}
+                  character={character}
+                  onSendBack={() => navigate(`/create?from=${encodeURIComponent(theirName)}&to=${encodeURIComponent(yourName)}`, { replace: true })}
+                />
+              ) : (
+                <motion.div
+                  className="mt-10 flex flex-col items-center gap-6"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <motion.p
+                    className="text-3xl sm:text-4xl text-foreground text-center"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    Maybe Next Time... 💔
+                  </motion.p>
+                  <motion.div
+                    className="text-4xl"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.8, ...SPRING }}
+                  >
+                    💔
+                  </motion.div>
+                  <motion.p
+                    className="text-xl text-muted-foreground text-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 2 }}
+                  >
+                    But hey, there's always chocolate 🍫
+                  </motion.p>
+                  <motion.div
+                    className="flex flex-col sm:flex-row gap-3 items-center"
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 2.5 }}
+                  >
+                    <button
+                      onClick={() => navigate(`/create?from=${encodeURIComponent(theirName)}&to=${encodeURIComponent(yourName)}`, { replace: true })}
+                      className="px-7 py-3 text-lg rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95 min-h-[48px]"
+                      style={{ borderColor: "hsl(var(--primary))" }}
+                    >
+                      💌 Send {yourName} a Valentine Instead
+                    </button>
+                    <button
+                      onClick={() => navigate("/create", { replace: true })}
+                      className="px-7 py-3 text-lg rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95 min-h-[48px]"
+                      style={{ borderColor: "hsl(var(--muted-foreground))" }}
+                    >
+                      💌 Send Your Own Valentine
+                    </button>
+                  </motion.div>
+                </motion.div>
+              )
             )}
           </AnimatePresence>
 
-          {/* Right - Receiver (Pink) */}
-          <motion.div
-            className="flex flex-col items-center gap-4"
-            animate={
-              showOutcome
-                ? outcome === "match"
-                  ? { x: matchPhase === "approaching" ? -approachDist : matchPhase === "pecking" ? -(approachDist + 8) : -(approachDist - 5) }
-                  : rightChoice === "NO"
-                  ? { x: 300, opacity: 0 }
-                  : {}
-                : {}
-            }
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-          >
-            <motion.div
-              animate={
-                celebrating
-                  ? { y: [0, -15, 0] }
-                  : shakeRight
-                  ? { rotate: [0, -5, 5, -3, 3, 0] }
-                  : {}
-              }
-              transition={
-                celebrating
-                  ? { repeat: Infinity, duration: 0.5, delay: 0.25 }
-                  : shakeRight
-                  ? { duration: 0.4 }
-                  : {}
-              }
-              onAnimationComplete={() => setShakeRight(false)}
-            >
-              <CharacterComponent color="pink" mirror confused={outcome === "mismatch"} />
-            </motion.div>
-            {!showOutcome && (
-              <div className="flex flex-col items-center gap-2">
-                <span className="text-xl text-foreground tracking-wide">{theirName}</span>
-                <div className="flex gap-3 items-center">
-                  <motion.div
-                    animate={{
-                      scale: noDodgeCount >= 5 ? 1.6 : noDodgeCount >= 4 ? 1.4 : noDodgeCount >= 3 ? 1.2 : noDodgeCount >= 2 ? 1.1 : 1,
-                      boxShadow: noDodgeCount >= 4
-                        ? "0 0 20px hsl(var(--brand-pink)), 0 0 40px hsl(var(--brand-pink))"
-                        : "none",
-                    }}
-                    transition={SPRING}
-                    style={{ borderRadius: "0.375rem" }}
-                  >
-                    <button
-                      onClick={async () => {
-                        setRightChoice("YES");
-                        sound.playDing();
-                        await submitChoice('YES');
-                      }}
-                      disabled={bothChosen || isSubmitting}
-                      className="px-7 py-3 text-xl font-hand rounded-md border-[3px] transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 min-h-[48px]"
-                      style={{
-                        borderColor: "hsl(var(--brand-green))",
-                        backgroundColor: rightChoice === "YES" ? "hsl(var(--brand-green))" : "transparent",
-                        color: rightChoice === "YES" ? "hsl(var(--background))" : "hsl(var(--foreground))",
-                        fontFamily: "'Patrick Hand', cursive",
-                      }}
-                    >
-                      YES 💚
-                    </button>
-                  </motion.div>
-                  <DodgeNoButton
-                    color="pink"
-                    selected={rightChoice === "NO"}
-                    onClick={async () => {
-                      setRightChoice("NO");
-                      sound.playBloop();
-                      await submitChoice('NO');
-                    }}
-                    disabled={bothChosen || isSubmitting}
-                    dodgeCount={noDodgeCount}
-                    onDodge={() => {
-                      setNoDodgeCount((c) => c + 1);
-                      setShakeRight(true);
-                      sound.playDodge();
-                    }}
-                    customStyle={{
-                      borderColor: "hsl(var(--muted-foreground))",
-                      fontSize: "0.9rem",
-                      padding: "0.35rem 0.75rem",
-                      opacity: 0.7,
-                    }}
-                  />
-                </div>
-                <AnimatePresence>
-                  {noDodgeCount > 0 && (
-                    <motion.p
-                      key={noDodgeCount}
-                      className="text-sm mt-1"
-                      style={{ color: "hsl(var(--brand-pink))", fontFamily: "'Patrick Hand', cursive" }}
-                      initial={{ opacity: 0, y: 5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      {dodgeText}
-                    </motion.p>
-                  )}
-                </AnimatePresence>
-              </div>
-            )}
-          </motion.div>
-        </div>
-
-        {/* Outcome */}
-        <AnimatePresence>
-          {showOutcome && (
-            outcome === "match" ? (
-              <MatchCertificate
-                yourName={yourName}
-                theirName={theirName}
-                character={character}
-                onSendBack={() => navigate(`/create?from=${encodeURIComponent(theirName)}&to=${encodeURIComponent(yourName)}`, { replace: true })}
-              />
-            ) : (
+          {/* Floating hearts - fewer on mobile */}
+          <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+            {[...Array(6)].map((_, i) => (
               <motion.div
-                className="mt-10 flex flex-col items-center gap-6"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
+                key={i}
+                className={`absolute text-2xl opacity-20 ${i >= 4 ? "hidden sm:block" : ""}`}
+                style={{ left: `${15 + i * 15}%`, top: `${20 + (i % 3) * 25}%` }}
+                animate={{ y: [0, -20, 0], rotate: [0, 10, -10, 0] }}
+                transition={{ repeat: Infinity, duration: 3 + i * 0.5, delay: i * 0.7, ease: "easeInOut" }}
               >
-                <motion.p
-                  className="text-3xl sm:text-4xl text-foreground text-center"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  Maybe Next Time... 💔
-                </motion.p>
-                <motion.div
-                  className="text-4xl"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.8, ...SPRING }}
-                >
-                  💔
-                </motion.div>
-                <motion.p
-                  className="text-xl text-muted-foreground text-center"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 2 }}
-                >
-                  But hey, there's always chocolate 🍫
-                </motion.p>
-                <motion.div
-                  className="flex flex-col sm:flex-row gap-3 items-center"
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 2.5 }}
-                >
-                  <button
-                    onClick={() => navigate(`/create?from=${encodeURIComponent(theirName)}&to=${encodeURIComponent(yourName)}`, { replace: true })}
-                    className="px-7 py-3 text-lg rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95 min-h-[48px]"
-                    style={{ borderColor: "hsl(var(--primary))" }}
-                  >
-                    💌 Send {yourName} a Valentine Instead
-                  </button>
-                  <button
-                    onClick={() => navigate("/create", { replace: true })}
-                    className="px-7 py-3 text-lg rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95 min-h-[48px]"
-                    style={{ borderColor: "hsl(var(--muted-foreground))" }}
-                  >
-                    💌 Send Your Own Valentine
-                  </button>
-                </motion.div>
+                💕
               </motion.div>
-            )
-          )}
-        </AnimatePresence>
-
-        {/* Floating hearts - fewer on mobile */}
-        <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-          {[...Array(6)].map((_, i) => (
-            <motion.div
-              key={i}
-              className={`absolute text-2xl opacity-20 ${i >= 4 ? "hidden sm:block" : ""}`}
-              style={{ left: `${15 + i * 15}%`, top: `${20 + (i % 3) * 25}%` }}
-              animate={{ y: [0, -20, 0], rotate: [0, 10, -10, 0] }}
-              transition={{ repeat: Infinity, duration: 3 + i * 0.5, delay: i * 0.7, ease: "easeInOut" }}
-            >
-              💕
-            </motion.div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
-    </PageTransition>
-  );
+      </PageTransition>
+    );
   }
 
   // RECEIVER VIEW - Already chose, show outcome
