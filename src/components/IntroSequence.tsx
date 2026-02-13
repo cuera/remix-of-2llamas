@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import PixelAlpaca from "./PixelAlpaca";
-import PixelDino from "./PixelDino";
-import PixelPanda from "./PixelPanda";
+import { CHARACTER_MAP } from "@/lib/characters";
 import type { CharacterType } from "./CharacterSelect";
 
 interface IntroSequenceProps {
@@ -16,8 +14,7 @@ const IntroSequence = ({ character, yourName, loveNote, onComplete }: IntroSeque
   const [scene, setScene] = useState(0);
   const [typedIndex, setTypedIndex] = useState(0);
 
-  const CharacterComponent =
-    character === "alpaca" ? PixelAlpaca : character === "dino" ? PixelDino : PixelPanda;
+  const CharacterComponent = CHARACTER_MAP[character];
 
   const hasNote = !!loveNote && loveNote.trim().length > 0;
 

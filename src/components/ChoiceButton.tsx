@@ -7,7 +7,7 @@ interface ChoiceButtonProps {
 }
 
 const ChoiceButton = ({ label, color, selected, onClick, disabled }: ChoiceButtonProps) => {
-  const borderColor = color === "green" ? "hsl(var(--alpaca-green))" : "hsl(var(--alpaca-pink))";
+  const borderColor = color === "green" ? "hsl(var(--brand-green))" : "hsl(var(--brand-pink))";
   const bgColor = selected ? borderColor : "transparent";
   const textColor = selected ? "hsl(var(--background))" : "hsl(var(--foreground))";
 

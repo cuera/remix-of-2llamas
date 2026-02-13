@@ -27,7 +27,7 @@ interface PixelAlpacaProps {
 }
 
 const PixelAlpaca = ({ color, mirror = false, className = "", confused = false }: PixelAlpacaProps) => {
-  const fillColor = color === "green" ? "hsl(var(--alpaca-green))" : "hsl(var(--alpaca-pink))";
+  const fillColor = color === "green" ? "hsl(var(--brand-green))" : "hsl(var(--brand-pink))";
   const darkColor = color === "green" ? "hsl(140 60% 35%)" : "hsl(330 80% 40%)";
 
   const grid = mirror

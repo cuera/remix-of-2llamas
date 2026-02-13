@@ -1,4 +1,4 @@
-const VISITOR_KEY = 'valentine-visitor-id'
+const VISITOR_KEY = 'otterly-visitor-id'
 
 export function getVisitorId(): string {
   let id = localStorage.getItem(VISITOR_KEY)

@@ -50,9 +50,9 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        alpaca: {
-          green: "hsl(var(--alpaca-green))",
-          pink: "hsl(var(--alpaca-pink))",
+        brand: {
+          green: "hsl(var(--brand-green))",
+          pink: "hsl(var(--brand-pink))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",

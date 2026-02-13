@@ -20,7 +20,7 @@ const DODGE_LABELS = [
 ];
 
 const DodgeNoButton = ({ color, selected, onClick, disabled, dodgeCount, onDodge, customStyle }: DodgeNoButtonProps) => {
-  const defaultBorder = color === "green" ? "hsl(var(--alpaca-green))" : "hsl(var(--alpaca-pink))";
+  const defaultBorder = color === "green" ? "hsl(var(--brand-green))" : "hsl(var(--brand-pink))";
   const borderColor = customStyle?.borderColor ?? defaultBorder;
   const bgColor = selected ? (borderColor as string) : "transparent";
   const textColor = selected ? "hsl(var(--background))" : "hsl(var(--foreground))";

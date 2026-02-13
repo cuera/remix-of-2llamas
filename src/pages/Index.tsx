@@ -266,7 +266,7 @@ const Index = () => {
                   animate={{
                     scale: noDodgeCount >= 5 ? 2 : noDodgeCount >= 4 ? 1.5 : noDodgeCount >= 3 ? 1.2 : 1,
                     boxShadow: noDodgeCount >= 4
-                      ? "0 0 20px hsl(var(--alpaca-pink)), 0 0 40px hsl(var(--alpaca-pink))"
+                      ? "0 0 20px hsl(var(--brand-pink)), 0 0 40px hsl(var(--brand-pink))"
                       : "none",
                   }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}

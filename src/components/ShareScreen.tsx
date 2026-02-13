@@ -3,9 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
-import PixelAlpaca from "./PixelAlpaca";
-import PixelDino from "./PixelDino";
-import PixelPanda from "./PixelPanda";
+import { CHARACTER_MAP } from "@/lib/characters";
 import type { CharacterType } from "./CharacterSelect";
 import { useValentine } from "@/hooks/useValentine";
 
@@ -34,8 +32,7 @@ const ShareScreen = ({
 
   const shareUrl = `${window.location.origin}/v/${valentineId}`;
 
-  const CharacterComponent =
-    character === "alpaca" ? PixelAlpaca : character === "dino" ? PixelDino : PixelPanda;
+  const CharacterComponent = CHARACTER_MAP[character];
 
   const handleCopy = async () => {
     try {
@@ -57,7 +54,7 @@ const ShareScreen = ({
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${yourName}'s Valentine for ${theirName}`,
+          title: `Otterly in Love — ${yourName}'s Valentine for ${theirName}`,
           text: `Hey ${theirName}, will you be my Valentine? 💕`,
           url: shareUrl,
         });

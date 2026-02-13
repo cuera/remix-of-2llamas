@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import PixelAlpaca from "@/components/PixelAlpaca";
-import PixelDino from "@/components/PixelDino";
-import PixelPanda from "@/components/PixelPanda";
+import { CHARACTER_MAP } from "@/lib/characters";
+import type { CharacterType } from "@/components/CharacterSelect";
 import PageTransition from "@/components/PageTransition";
 import { useValentineCount } from "@/hooks/useValentineCount";
 
@@ -24,27 +23,24 @@ const HomePage = () => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          Valentine Alpaca 💌
+          Otterly in Love 🦦
         </motion.h1>
 
         <motion.div
-          className="flex items-end gap-6 sm:gap-10 mb-8"
+          className="flex flex-wrap items-end justify-center gap-4 sm:gap-8 mb-8"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.15, duration: 0.6, ease: "easeOut" }}
         >
-          <div className="flex items-end gap-2">
-            <PixelAlpaca color="green" className="scale-50 sm:scale-75" />
-            <PixelAlpaca color="pink" mirror className="scale-50 sm:scale-75" />
-          </div>
-          <div className="flex items-end gap-2">
-            <PixelDino color="green" className="scale-50 sm:scale-75" />
-            <PixelDino color="pink" mirror className="scale-50 sm:scale-75" />
-          </div>
-          <div className="flex items-end gap-2">
-            <PixelPanda color="green" className="scale-50 sm:scale-75" />
-            <PixelPanda color="pink" mirror className="scale-50 sm:scale-75" />
-          </div>
+          {(Object.keys(CHARACTER_MAP) as CharacterType[]).map((type) => {
+            const Comp = CHARACTER_MAP[type];
+            return (
+              <div key={type} className="flex items-end gap-1">
+                <Comp color="green" className="scale-[0.4] sm:scale-[0.6]" />
+                <Comp color="pink" mirror className="scale-[0.4] sm:scale-[0.6]" />
+              </div>
+            );
+          })}
         </motion.div>
 
         <motion.p

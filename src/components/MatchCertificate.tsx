@@ -1,9 +1,7 @@
 import { useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { toPng } from "html-to-image";
-import PixelAlpaca from "./PixelAlpaca";
-import PixelDino from "./PixelDino";
-import PixelPanda from "./PixelPanda";
+import { CHARACTER_MAP } from "@/lib/characters";
 import type { CharacterType } from "./CharacterSelect";
 
 interface MatchCertificateProps {
@@ -23,12 +21,7 @@ const MatchCertificate = ({
 }: MatchCertificateProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const CharacterComponent =
-    character === "alpaca"
-      ? PixelAlpaca
-      : character === "dino"
-      ? PixelDino
-      : PixelPanda;
+  const CharacterComponent = CHARACTER_MAP[character];
 
   const handleDownload = useCallback(async () => {
     if (!cardRef.current) return;
@@ -38,7 +31,7 @@ const MatchCertificate = ({
         backgroundColor: "hsl(270, 40%, 17%)",
       });
       const link = document.createElement("a");
-      link.download = `valentine-${yourName}-${theirName}.png`;
+      link.download = `otterly-${yourName}-${theirName}.png`;
       link.href = dataUrl;
       link.click();
     } catch (err) {
@@ -55,17 +48,17 @@ const MatchCertificate = ({
       });
       const response = await fetch(dataUrl);
       const blob = await response.blob();
-      const file = new File([blob], `valentine-${yourName}-${theirName}.png`, { type: "image/png" });
+      const file = new File([blob], `otterly-${yourName}-${theirName}.png`, { type: "image/png" });
 
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         await navigator.share({
-          text: `${yourName} & ${theirName} are Valentines! 💕 Send yours: ${window.location.origin}`,
+          text: `${yourName} & ${theirName} are Otterly in Love! 💕 Send yours: ${window.location.origin}`,
           files: [file],
         });
       } else {
         // Fallback: WhatsApp text-only share
         const text = encodeURIComponent(
-          `${yourName} & ${theirName} are Valentines! 💕 Send yours: ${window.location.origin}`
+          `${yourName} & ${theirName} are Otterly in Love! 💕 Send yours: ${window.location.origin}`
         );
         window.open(`https://wa.me/?text=${text}`, "_blank");
       }
@@ -149,7 +142,7 @@ const MatchCertificate = ({
           <p
             className="text-2xl sm:text-3xl font-bold tracking-wide"
             style={{
-              color: "hsl(var(--alpaca-pink))",
+              color: "hsl(var(--brand-pink))",
               textShadow: "0 0 20px hsla(330, 80%, 51%, 0.5)",
             }}
           >
@@ -160,7 +153,7 @@ const MatchCertificate = ({
         {/* Names */}
         <p
           className="text-2xl sm:text-3xl text-center font-bold tracking-wide"
-          style={{ color: "hsl(var(--alpaca-pink))" }}
+          style={{ color: "hsl(var(--brand-pink))" }}
         >
           {yourName} ❤️ {theirName}
         </p>
@@ -170,7 +163,7 @@ const MatchCertificate = ({
           className="text-base sm:text-lg mt-1 tracking-widest uppercase text-muted-foreground"
           style={{ letterSpacing: "0.15em", color: "hsl(270, 20%, 50%)" }}
         >
-          Valentine's Day 2026
+          Otterly in Love 🦦 — Valentine's 2026
         </p>
 
         <p
@@ -191,7 +184,7 @@ const MatchCertificate = ({
         <motion.button
           onClick={handleShareResult}
           className={buttonBase}
-          style={{ borderColor: "hsl(var(--alpaca-pink))", backgroundColor: "hsl(var(--alpaca-pink))", color: "white" }}
+          style={{ borderColor: "hsl(var(--brand-pink))", backgroundColor: "hsl(var(--brand-pink))", color: "white" }}
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.8 }}
@@ -204,7 +197,7 @@ const MatchCertificate = ({
         <motion.button
           onClick={onSendBack}
           className={buttonBase}
-          style={{ borderColor: "hsl(var(--alpaca-green))" }}
+          style={{ borderColor: "hsl(var(--brand-green))" }}
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 2.0 }}

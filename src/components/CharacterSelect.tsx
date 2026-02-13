@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import PixelAlpaca from "./PixelAlpaca";
-import PixelDino from "./PixelDino";
-import PixelPanda from "./PixelPanda";
+import { CHARACTER_MAP } from "@/lib/characters";
 
-export type CharacterType = "alpaca" | "dino" | "panda";
+export type CharacterType = "alpaca" | "dino" | "panda" | "otter" | "lobster" | "penguin";
 
 interface CharacterSelectProps {
   onSelect: (type: CharacterType) => void;
@@ -12,6 +10,9 @@ interface CharacterSelectProps {
 }
 
 const characters: { type: CharacterType; label: string; emoji: string }[] = [
+  { type: "otter", label: "Otters", emoji: "🦦" },
+  { type: "penguin", label: "Penguins", emoji: "🐧" },
+  { type: "lobster", label: "Lobsters", emoji: "🦞" },
   { type: "alpaca", label: "Alpacas", emoji: "🦙" },
   { type: "dino", label: "Dinos", emoji: "🦕" },
   { type: "panda", label: "Pandas", emoji: "🐼" },
@@ -42,43 +43,32 @@ const CharacterSelect = ({ onSelect, isLoading = false }: CharacterSelectProps) 
         Pick your characters! 💕
       </motion.p>
 
-      <div className="flex flex-col sm:flex-row gap-8 sm:gap-12">
-        {characters.map((char, i) => (
-          <motion.button
-            key={char.type}
-            className={`flex flex-col items-center gap-4 p-6 rounded-xl border-[3px] bg-card/50 transition-colors cursor-pointer min-h-[48px] ${
-              selected === char.type ? "border-primary" : "border-border hover:border-primary"
-            }`}
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 + i * 0.15 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => setSelected(char.type)}
-          >
-            <div className="flex items-end gap-3">
-              {char.type === "alpaca" ? (
-                <>
-                  <PixelAlpaca color="green" className="scale-75" />
-                  <PixelAlpaca color="pink" mirror className="scale-75" />
-                </>
-              ) : char.type === "dino" ? (
-                <>
-                  <PixelDino color="green" className="scale-75" />
-                  <PixelDino color="pink" mirror className="scale-75" />
-                </>
-              ) : (
-                <>
-                  <PixelPanda color="green" className="scale-75" />
-                  <PixelPanda color="pink" mirror className="scale-75" />
-                </>
-              )}
-            </div>
-            <span className="text-2xl text-foreground">
-              {char.emoji} {char.label}
-            </span>
-          </motion.button>
-        ))}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6 w-full max-w-2xl px-2">
+        {characters.map((char, i) => {
+          const Comp = CHARACTER_MAP[char.type];
+          return (
+            <motion.button
+              key={char.type}
+              className={`flex flex-col items-center gap-3 p-4 sm:p-5 rounded-xl border-[3px] bg-card/50 transition-colors cursor-pointer min-h-[48px] ${
+                selected === char.type ? "border-primary" : "border-border hover:border-primary"
+              }`}
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4 + i * 0.1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setSelected(char.type)}
+            >
+              <div className="flex items-end gap-2">
+                <Comp color="green" className="scale-[0.6] sm:scale-75" />
+                <Comp color="pink" mirror className="scale-[0.6] sm:scale-75" />
+              </div>
+              <span className="text-lg sm:text-xl text-foreground">
+                {char.emoji} {char.label}
+              </span>
+            </motion.button>
+          );
+        })}
       </div>
 
       <motion.button

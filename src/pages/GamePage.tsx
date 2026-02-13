@@ -1,9 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import PixelAlpaca from "@/components/PixelAlpaca";
-import PixelDino from "@/components/PixelDino";
-import PixelPanda from "@/components/PixelPanda";
+import { CHARACTER_MAP, APPROACH_DIST } from "@/lib/characters";
 import ConfettiHearts from "@/components/ConfettiHearts";
 import MatchCertificate from "@/components/MatchCertificate";
 import DodgeNoButton from "@/components/DodgeNoButton";
@@ -118,7 +116,7 @@ const GamePage = () => {
       <PageTransition>
         <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ fontFamily: "'Patrick Hand', cursive" }}>
           <span className="text-4xl">💔</span>
-          <h1 className="text-3xl text-foreground">Valentine not found</h1>
+          <h1 className="text-3xl text-foreground">Not found</h1>
           <button
             onClick={() => navigate('/')}
             className="px-6 py-3 rounded-lg border-2 border-border text-foreground hover:scale-105 active:scale-95 transition-all min-h-[48px]"
@@ -150,8 +148,8 @@ const GamePage = () => {
   }
 
   const bothChosen = rightChoice !== null;
-  const CharacterComponent = character === "alpaca" ? PixelAlpaca : character === "dino" ? PixelDino : PixelPanda;
-  const approachDist = character === "alpaca" ? 55 : character === "dino" ? 48 : 55;
+  const CharacterComponent = CHARACTER_MAP[character];
+  const approachDist = APPROACH_DIST[character];
   const celebrating = matchPhase === "celebrating";
 
   const DODGE_TEXTS = [
@@ -280,7 +278,7 @@ const GamePage = () => {
                     animate={{
                       scale: noDodgeCount >= 5 ? 1.6 : noDodgeCount >= 4 ? 1.4 : noDodgeCount >= 3 ? 1.2 : noDodgeCount >= 2 ? 1.1 : 1,
                       boxShadow: noDodgeCount >= 4
-                        ? "0 0 20px hsl(var(--alpaca-pink)), 0 0 40px hsl(var(--alpaca-pink))"
+                        ? "0 0 20px hsl(var(--brand-pink)), 0 0 40px hsl(var(--brand-pink))"
                         : "none",
                     }}
                     transition={SPRING}
@@ -295,8 +293,8 @@ const GamePage = () => {
                       disabled={bothChosen || isSubmitting}
                       className="px-7 py-3 text-xl font-hand rounded-md border-[3px] transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 min-h-[48px]"
                       style={{
-                        borderColor: "hsl(var(--alpaca-green))",
-                        backgroundColor: rightChoice === "YES" ? "hsl(var(--alpaca-green))" : "transparent",
+                        borderColor: "hsl(var(--brand-green))",
+                        backgroundColor: rightChoice === "YES" ? "hsl(var(--brand-green))" : "transparent",
                         color: rightChoice === "YES" ? "hsl(var(--background))" : "hsl(var(--foreground))",
                         fontFamily: "'Patrick Hand', cursive",
                       }}
@@ -332,7 +330,7 @@ const GamePage = () => {
                     <motion.p
                       key={noDodgeCount}
                       className="text-sm mt-1"
-                      style={{ color: "hsl(var(--alpaca-pink))", fontFamily: "'Patrick Hand', cursive" }}
+                      style={{ color: "hsl(var(--brand-pink))", fontFamily: "'Patrick Hand', cursive" }}
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
@@ -435,7 +433,7 @@ const GamePage = () => {
 
   // RECEIVER VIEW - Already chose, show outcome
   if (role === 'receiver' && valentine.receiver_choice) {
-    const CharacterComponent = character === "alpaca" ? PixelAlpaca : character === "dino" ? PixelDino : PixelPanda;
+    const CharacterComponent = CHARACTER_MAP[character];
     const didMatch = valentine.receiver_choice === 'YES';
 
     return (
@@ -477,7 +475,7 @@ const GamePage = () => {
 
   // SENDER VIEW - Watching status
   if (role === 'sender') {
-    const CharacterComponent = character === "alpaca" ? PixelAlpaca : character === "dino" ? PixelDino : PixelPanda;
+    const CharacterComponent = CHARACTER_MAP[character];
 
     return (
       <PageTransition>
@@ -557,7 +555,7 @@ const GamePage = () => {
 
   // STRANGER VIEW
   if (role === 'stranger') {
-    const CharacterComponent = character === "alpaca" ? PixelAlpaca : character === "dino" ? PixelDino : PixelPanda;
+    const CharacterComponent = CHARACTER_MAP[character];
 
     return (
       <PageTransition>
@@ -569,7 +567,7 @@ const GamePage = () => {
               animate={{ opacity: 1 }}
             >
               <h1 className="text-3xl text-foreground text-center">
-                {valentine.receiver_choice === 'YES' ? '💕 A Valentine Match!' : '💔 A Valentine Story'}
+                {valentine.receiver_choice === 'YES' ? '💕 Otterly in Love!' : '💔 Not Meant to Be'}
               </h1>
               <div className="flex items-end gap-8">
                 <div className="flex flex-col items-center gap-2">
@@ -584,7 +582,7 @@ const GamePage = () => {
               <p className="text-xl text-muted-foreground text-center">
                 {valentine.receiver_choice === 'YES'
                   ? `${yourName} and ${theirName} are a match! 💕`
-                  : `${theirName} said no to ${yourName}'s valentine`
+                  : `${theirName} said no to ${yourName}`
                 }
               </p>
               <button
