@@ -45,7 +45,7 @@ const ShareScreen = ({
 
   const handleWhatsApp = () => {
     const text = encodeURIComponent(
-      `Hey ${theirName}! 💌 Someone has a Valentine's Day question for you... will you open it? 👉 ${shareUrl}`
+      `I'm otterly in love with you! Will you be my valentine? 🦦💕 ${shareUrl}`
     );
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };
@@ -183,7 +183,7 @@ const ShareScreen = ({
           transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
         >
           <span className="text-lg text-muted-foreground">
-            ⏳ Waiting for {theirName} to open...
+            Waiting for your otter half to respond... 🦦
           </span>
         </motion.div>
       )}
@@ -253,7 +253,7 @@ const ShareScreen = ({
           onClick={onSendAnother}
           className="px-8 py-3 text-xl rounded-lg border-[3px] border-primary text-foreground transition-all hover:scale-105 active:scale-95 min-h-[48px]"
         >
-          💌 Send Another Valentine
+          Send another? You otter do it! 💌
         </button>
         <button
           onClick={onPreviewAsReceiver}

@@ -416,7 +416,7 @@ const GamePage = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
                   >
-                    Maybe Next Time... 💔
+                    That's otterly unfortunate... 🦦💔
                   </motion.p>
                   <motion.div
                     className="text-4xl"
@@ -432,7 +432,7 @@ const GamePage = () => {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 2 }}
                   >
-                    But hey, there's always chocolate 🍫
+                    But there are plenty of fish in the sea 🦦
                   </motion.p>
                   <motion.div
                     className="flex flex-col sm:flex-row gap-3 items-center"
@@ -452,7 +452,7 @@ const GamePage = () => {
                       className="px-7 py-3 text-lg rounded-lg border-[3px] text-foreground transition-all hover:scale-105 active:scale-95 min-h-[48px]"
                       style={{ borderColor: "hsl(var(--muted-foreground))" }}
                     >
-                      💌 Send Your Own Valentine
+                      Don't be shellfish — send your own! 💌
                     </button>
                   </motion.div>
                 </motion.div>
@@ -548,7 +548,7 @@ const GamePage = () => {
               animate={{ opacity: [0.5, 1, 0.5] }}
               transition={{ repeat: Infinity, duration: 2 }}
             >
-              <p className="text-xl text-muted-foreground">⏳ Waiting for {theirName} to open...</p>
+              <p className="text-xl text-muted-foreground">Waiting for your otter half to respond... 🦦</p>
             </motion.div>
           )}
 
@@ -587,12 +587,12 @@ const GamePage = () => {
               animate={{ opacity: 1 }}
             >
               <p className="text-2xl text-foreground">💔 {theirName} said no...</p>
-              <p className="text-lg text-muted-foreground">Better luck next time</p>
+              <p className="text-lg text-muted-foreground">That's otterly unfortunate... 🦦</p>
               <button
                 onClick={() => navigate("/create")}
                 className="px-6 py-3 rounded-lg border-2 border-border text-foreground hover:scale-105 active:scale-95 transition-all min-h-[48px]"
               >
-                💌 Send Another Valentine
+                Send another? You otter do it! 💌
               </button>
             </motion.div>
           )}
@@ -637,7 +637,7 @@ const GamePage = () => {
                 onClick={() => navigate("/create")}
                 className="px-6 py-3 rounded-lg border-2 border-primary text-foreground hover:scale-105 active:scale-95 transition-all min-h-[48px]"
               >
-                💌 Send Your Own Valentine
+                Don't be shellfish — send your own! 💌
               </button>
             </motion.div>
           ) : (
@@ -657,7 +657,7 @@ const GamePage = () => {
                 onClick={() => navigate("/create")}
                 className="px-6 py-3 rounded-lg border-2 border-primary text-foreground hover:scale-105 active:scale-95 transition-all min-h-[48px]"
               >
-                💌 Send Your Own Valentine →
+                Don't be shellfish — send your own! 💌
               </button>
             </motion.div>
           )}
